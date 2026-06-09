@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orca — Orçamentos d'Avila</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#007fac;--azul-dark:#005f82;--azul-light:#d6eef5;--azul-pale:#f0f8fc;
+  --cinza:#444443;--cinza-mid:#7a7a79;--cinza-light:#d8d8d7;--cinza-pale:#f5f5f5;
+  --white:#ffffff;--text:#444443;--text2:#6b6b6a;--text3:#aaaaaa;
+  --border:#d0dfe6;--border-light:#e8f2f7;--red:#c0392b;--green:#27ae60;--orange:#e67e22;
+  --shadow-sm:0 1px 4px rgba(0,127,172,.08);--shadow:0 4px 18px rgba(0,127,172,.12);--shadow-lg:0 8px 36px rgba(0,127,172,.16);
+  --radius:8px;--radius-lg:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito Sans','Segoe UI',sans-serif;background:var(--cinza-pale);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:84px;background:var(--white);border-bottom:3px solid var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,127,172,.1)}
+.logo-wrap{display:flex;align-items:center;gap:16px}
+.logo-img{height:68px;width:auto;display:block}
+.logo-tagline-header{font-size:10px;font-weight:700;color:rgba(68,68,67,.45);text-transform:uppercase;letter-spacing:1.6px;border-left:1px solid var(--cinza-light);padding-left:16px;white-space:nowrap}
+.header-right{display:flex;align-items:center;gap:10px}
+.badge-status{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid;color:var(--azul);background:var(--azul-light);border-color:rgba(0,127,172,.3)}
+.header-nav{display:flex;align-items:center;gap:4px}
+.nav-btn{background:transparent;border:1px solid transparent;color:var(--text2);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:all .14s;display:flex;align-items:center;gap:6px}
+.nav-btn:hover{border-color:var(--border);color:var(--azul);background:var(--azul-pale)}
+.nav-btn.active{background:var(--azul);color:var(--white);border-color:var(--azul)}
+.nav-sep{width:1px;height:20px;background:var(--cinza-light);margin:0 4px}
+.user-info{display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--radius);background:var(--azul-pale);border:1px solid var(--border)}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--azul);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--white);flex-shrink:0}
+.user-name{font-size:12px;font-weight:700;color:var(--text)}
+.user-role{font-size:10px;font-weight:700;color:var(--azul);background:var(--azul-light);border:1px solid rgba(0,127,172,.2);padding:1px 7px;border-radius:10px}
+.btn-logout{background:transparent;border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;transition:all .14s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 84px);padding:40px 20px}
+.login-card{background:var(--white);border:1px solid var(--border);border-top:3px solid var(--azul);border-radius:var(--radius-lg);width:100%;max-width:400px;box-shadow:var(--shadow-lg)}
+.login-header{padding:28px 28px 20px;text-align:center;border-bottom:1px solid var(--border-light);background:var(--azul-pale);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.login-title{font-size:20px;font-weight:800;color:var(--cinza)}
+.login-sub{font-size:12px;color:var(--text2);margin-top:4px}
+.login-body{padding:24px 28px}
+.login-footer{padding:16px 28px;border-top:1px solid var(--border-light);background:var(--azul-pale);border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+.login-error{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.3);color:var(--red);font-size:12px;font-weight:700;padding:10px 14px;border-radius:var(--radius);margin-bottom:14px;display:none}
+
+/* APP */
+#app-screen{display:none}
+.app-inner{padding:24px 28px;max-width:1280px;margin:0 auto}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;gap:16px;flex-wrap:wrap}
+.page-title{font-size:22px;font-weight:800;color:var(--cinza);letter-spacing:-.2px}
+.page-title span{color:var(--azul)}
+
+/* STATS */
+.stats-bar{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);min-width:130px}
+.stat-icon{width:36px;height:36px;border-radius:8px;background:var(--azul-light);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.stat-val{font-size:22px;font-weight:800;color:var(--azul);line-height:1}
+.stat-lbl{font-size:11px;color:var(--text2);font-weight:700;margin-top:2px}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab{padding:10px 20px;font-size:13px;font-weight:700;color:var(--text3);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--azul)}
+.tab.active{color:var(--azul);border-bottom-color:var(--azul);background:var(--azul-pale)}
+.tab-count{font-size:10px;font-weight:800;padding:1px 7px;border-radius:10px;background:var(--azul-light);color:var(--azul)}
+.tab.active .tab-count{background:var(--azul);color:var(--white)}
+
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.data-table{width:100%;border-collapse:collapse}
+.data-table thead tr{background:var(--azul-pale)}
+.data-table th{font-size:10px;font-weight:800;color:var(--azul);text-transform:uppercase;letter-spacing:1.1px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+.data-table td{padding:11px 14px;vertical-align:middle;border-bottom:1px solid var(--border-light);font-size:13px;color:var(--text)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tbody tr.clickable{cursor:pointer;transition:background .1s}
+.data-table tbody tr.clickable:hover{background:var(--azul-pale)}
+.data-table tbody tr.row-selected{background:var(--azul-light)!important}
+.data-table tbody tr.suspensa{opacity:.55;font-style:italic}
+
+/* PILLS */
+.status-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;border:1px solid}
+.s-em_elaboracao{background:#fff8e1;color:#b7720a;border-color:#f5c842}
+.s-emitida{background:#e8f5e9;color:#1b7a3e;border-color:#4caf7d}
+.s-em_follow_up{background:#e3f2fd;color:#1565c0;border-color:#64b5f6}
+.s-em_revisao{background:#fce4ec;color:#ad1457;border-color:#f48fb1}
+.s-suspensa{background:var(--cinza-pale);color:var(--cinza-mid);border-color:var(--cinza-light)}
+.s-conquistada{background:#e8f5e9;color:#1b5e20;border-color:#81c784}
+.s-perdida{background:#ffebee;color:#b71c1c;border-color:#ef9a9a}
+.s-cancelada{background:var(--cinza-pale);color:var(--text3);border-color:var(--cinza-light)}
+.pill-ativo{background:#e8f5e9;color:#1b7a3e;border:1px solid #4caf7d;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.pill-inativo{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.pill-admin{background:rgba(0,127,172,.12);color:var(--azul);border:1px solid rgba(0,127,172,.25);font-size:11px;font-weight:800;padding:2px 9px;border-radius:20px}
+.pill-sigla{background:var(--azul);color:var(--white);font-size:11px;font-weight:800;padding:2px 9px;border-radius:5px;font-family:monospace;letter-spacing:.5px}
+.pill-regime{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(0,127,172,.07);color:var(--azul);border:1px solid rgba(0,127,172,.15)}
+.tipo-pj{font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;background:#e8f5e9;color:#1b7a3e;border:1px solid #4caf7d}
+.tipo-pf{font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;background:#e3f2fd;color:#1565c0;border:1px solid #64b5f6}
+.class-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin:1px;display:inline-block}
+.class-cliente{background:#fff8e1;color:#b7720a;border:1px solid #f5c842}
+.class-fornecedor{background:#fce4ec;color:#ad1457;border:1px solid #f48fb1}
+.prop-num{font-size:12px;font-weight:800;color:var(--azul);background:var(--azul-light);padding:3px 9px;border-radius:5px;white-space:nowrap;font-family:monospace}
+.prop-rev{font-size:10px;color:var(--text3);margin-left:4px;font-weight:700}
+.emit-tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:4px;background:rgba(0,127,172,.08);color:var(--azul);border:1px solid rgba(0,127,172,.15)}
+.obj-text{max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text2);font-size:12.5px}
+.date-text{font-size:12px;color:var(--text3);white-space:nowrap}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-input{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:7px 12px;font-size:13px;font-family:inherit;color:var(--text);min-width:220px}
+.filter-input:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,127,172,.1)}
+.filter-select{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:7px 12px;font-size:13px;font-family:inherit;color:var(--text);cursor:pointer}
+.filter-select:focus{outline:none;border-color:var(--azul)}
+
+/* SPLIT LAYOUT */
+.split-layout{display:flex;gap:0;height:calc(100vh - 84px - 180px);min-height:400px}
+.split-list{flex:1;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-lg) 0 0 var(--radius-lg);background:var(--white);box-shadow:var(--shadow-sm)}
+.split-list::-webkit-scrollbar{width:4px}
+.split-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.split-panel{width:400px;min-width:360px;background:var(--white);border:1px solid var(--border);border-left:none;border-radius:0 var(--radius-lg) var(--radius-lg) 0;display:flex;flex-direction:column;box-shadow:var(--shadow-sm);transition:width .2s}
+.split-panel.hidden{width:0;min-width:0;overflow:hidden;border:none}
+.panel-header{padding:16px 20px 12px;border-bottom:1px solid var(--border-light);background:var(--azul-pale);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-shrink:0}
+.panel-title{font-size:15px;font-weight:800;color:var(--cinza);line-height:1.3}
+.panel-subtitle{font-size:11px;color:var(--text2);margin-top:2px}
+.panel-close{background:transparent;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px;transition:all .13s;flex-shrink:0}
+.panel-close:hover{background:var(--border-light);color:var(--text)}
+.panel-body{flex:1;overflow-y:auto;padding:16px 20px}
+.panel-body::-webkit-scrollbar{width:4px}
+.panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.panel-footer{padding:12px 20px;border-top:1px solid var(--border-light);background:var(--azul-pale);display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.panel-section{font-size:10px;font-weight:800;color:var(--azul);text-transform:uppercase;letter-spacing:1.2px;margin:14px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--border-light)}
+.panel-section:first-child{margin-top:0}
+.panel-field{margin-bottom:10px}
+.panel-label{font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}
+.panel-value{font-size:13px;color:var(--text);font-weight:600}
+.panel-value.empty{color:var(--text3);font-weight:400;font-style:italic}
+
+/* CONTATOS */
+.contato-item{background:var(--cinza-pale);border:1px solid var(--border-light);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;position:relative}
+.contato-nome{font-size:13px;font-weight:700;color:var(--text)}
+.contato-cargo{font-size:11px;color:var(--text2);margin-top:1px}
+.contato-email{font-size:11px;color:var(--azul);margin-top:2px}
+.contato-tel{font-size:11px;color:var(--text3)}
+.contato-actions{position:absolute;top:8px;right:8px;display:flex;gap:3px;opacity:0;transition:opacity .13s}
+.contato-item:hover .contato-actions{opacity:1}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:50px 30px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-sub{font-size:13px}
+
+/* BTNS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:1px solid transparent;transition:all .17s}
+.btn-primary{background:var(--azul);color:var(--white);border-color:var(--azul)}
+.btn-primary:hover{background:var(--azul-dark)}
+.btn-ghost{background:transparent;border-color:var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--azul);color:var(--azul);background:var(--azul-pale)}
+.btn-danger{background:transparent;border-color:rgba(192,57,43,.4);color:var(--red)}
+.btn-danger:hover{background:rgba(192,57,43,.07)}
+.btn-success{background:transparent;border-color:rgba(39,174,96,.4);color:var(--green)}
+.btn-success:hover{background:rgba(39,174,96,.07)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.icon-btn{background:transparent;border:1px solid var(--border);color:var(--text2);padding:4px 8px;border-radius:5px;cursor:pointer;font-size:12px;transition:all .13s;font-family:inherit;line-height:1}
+.icon-btn:hover{border-color:var(--azul);color:var(--azul);background:var(--azul-pale)}
+.icon-btn.del:hover{border-color:var(--red);color:var(--red);background:rgba(192,57,43,.05)}
+.row-actions{display:flex;gap:4px;justify-content:flex-end}
+
+/* LOGO PREVIEW */
+.logo-preview{width:80px;height:60px;border:1px solid var(--border);border-radius:var(--radius);object-fit:contain;background:var(--white);padding:4px}
+.logo-preview-empty{width:80px;height:60px;border:1px dashed var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--cinza-pale);color:var(--text3)}
+.logo-upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all .15s;background:var(--cinza-pale)}
+.logo-upload-area:hover{border-color:var(--azul);background:var(--azul-pale)}
+.logo-upload-area input{display:none}
+
+/* FORM */
+.form-grid{display:grid;gap:13px}
+.form-grid-2{grid-template-columns:1fr 1fr}
+.form-grid-3{grid-template-columns:1fr 1fr 1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.span2{grid-column:span 2}
+.form-group.span3{grid-column:span 3}
+label{font-size:10.5px;font-weight:800;color:var(--azul);text-transform:uppercase;letter-spacing:1px}
+input,select,textarea{background:var(--cinza-pale);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 12px;font-size:13px;font-family:inherit;width:100%;transition:border-color .14s,box-shadow .14s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,127,172,.1);background:var(--white)}
+input[type=checkbox]{width:auto;margin:0}
+input[type=file]{padding:6px;font-size:12px;cursor:pointer}
+.field-hint{font-size:11px;color:var(--text3);margin-top:2px}
+.checkbox-row{display:flex;align-items:center;gap:8px;padding:6px 0}
+.checkbox-row label{text-transform:none;letter-spacing:0;font-size:13px;font-weight:700;color:var(--text);cursor:pointer}
+.form-section-title{font-size:10px;font-weight:800;color:var(--azul);text-transform:uppercase;letter-spacing:1.3px;padding:14px 0 6px;border-top:1px solid var(--border-light);margin-top:4px;grid-column:1/-1}
+.form-section-title:first-child{border-top:none;padding-top:0}
+.emit-checklist{display:flex;flex-direction:column;gap:6px;max-height:140px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;background:var(--cinza-pale)}
+.emit-check-item{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer}
+.emit-check-item input{width:15px;height:15px;cursor:pointer}
+.warn-box{background:#fff8e1;border:1px solid #f5c842;border-radius:var(--radius);padding:10px 14px;font-size:12px;color:#7a5c00;margin-bottom:8px;grid-column:1/-1}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(68,68,67,.5);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border:1px solid var(--border);border-top:3px solid var(--azul);border-radius:var(--radius-lg);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .22s ease}
+.modal.modal-lg{max-width:680px}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;background:var(--azul-pale)}
+.modal-title{font-size:16px;font-weight:800;color:var(--cinza)}
+.modal-close{background:transparent;border:none;color:var(--text3);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:5px;transition:all .13s}
+.modal-close:hover{background:var(--border-light);color:var(--text)}
+.modal-body{padding:20px 22px}
+.modal-footer{padding:12px 22px;border-top:1px solid var(--border-light);display:flex;gap:10px;justify-content:flex-end;background:var(--azul-pale)}
+
+/* TOAST / LOADING / BLOCK */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:11px 16px;font-size:13px;font-weight:700;color:var(--text);box-shadow:var(--shadow);animation:toastIn .22s ease;max-width:320px;pointer-events:auto}
+.toast.success{border-left:3px solid var(--azul)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.warn{border-left:3px solid var(--orange)}
+@keyframes toastIn{from{transform:translateX(14px);opacity:0}to{transform:translateX(0);opacity:1}}
+.loading{display:flex;align-items:center;gap:10px;padding:50px;justify-content:center;color:var(--text2);font-size:14px;font-weight:700}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--azul);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.block-overlay{position:fixed;inset:0;background:rgba(255,255,255,.75);backdrop-filter:blur(2px);z-index:900;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.block-overlay.active{display:flex}
+.block-overlay .spinner{width:32px;height:32px;border-width:3px}
+.block-overlay p{font-size:14px;font-weight:700;color:var(--azul)}
+.info-box{background:var(--azul-pale);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:16px}
+.info-box strong{color:var(--azul)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAB0AY4DASIAAhEBAxEB/8QAHQABAAMAAwEBAQAAAAAAAAAAAAYHCAIEBQkDAf/EAE8QAAEDBAADBQUBCwUNCQAAAAECAwQABQYRBxIhCBMxQWEUIlFxgTIVIzdCUmJydZGhsxYXQ1aCGCQzY4SSlKKxtMLR0iU2U3ODlaXB0//EABsBAQACAwEBAAAAAAAAAAAAAAABBQMEBgcC/8QAMREBAAEDAgIHBwUBAQAAAAAAAAECAwQFESExEiJBUWGBsQYTcaHB0eEUQpHw8SMy/9oADAMBAAIRAxEAPwDZdKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFKUoFfg1MiOzHobUplclhKVPMpWCtsK3ylQ8RvR1vx1Vf8b85lY1j4iY+hUi8TCUIW0jvPZkj7SyBv3uoAB8+vXWqpzs73W4wOLjUeeqV3l1Zdbf78q5lq5S4FK31J2jx9T61Y2NOquWKr0zttyjv2U2VrFFjLoxojfpTETPZG/LzaqpSlVy5KUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUpQKUqgu0XxNejvPYbYJBbUE8txkIPUb/okny6faPrr41s4uLXk3It0NLPzrWDZm7c/wBnue3xO44WyxPO2vGWmrpcEEpW+o/3u0fgNdVkemh6+VUNk+eZdkbq1XW+zFtq394bX3bQB8uROgfrs1xsGD5Xf7Su62azPToaFltS2lpJCgASOXfNvRHl514lwhTLfKVEnxJESQj7TT7ZQtPzB6iuuxMPFsdWjaao59s/h51qOp5+T17m9NE8o4xH5a27O9pbtfCu2rCAHZpXKdIHiVK0n/VSmuv2kbqLXwze7t4sy5MllqOtCuVaVBYWSkjqOiD1Hxr9uAt6iyeENukSJDTSbehxiQtawEthCiQST4DkKT9aonjxnqc0yZLMBR+5Fv5m4x/8ZR+05r10APQeWyKo8bGuX8+qauVMzM/y6rNzrWLpFFNM8aqYiPOOM+Xq54ZxnzLH1oaly/uzDGgWZh2sD0c+1v57HpWjOHefWDN4BetbxblNjb8R3Qdb9dfjJ9R+49KxVXoY9eLjYLvHutqkrjS2FcyFp8/iCPMHwIq4zdJtX4maI6NX95ub0z2hyMSqKbs9Kjx5x8J+jeFKifCvNYmcYu3cmkpaltHu5jAP+Dc14j80+I/Z5GpZXH3LdVuqaKo2mHpFm9Reoi5RO8TyKUpXwyFKVh7O+JvECHnF+hxcuuzMdi5SG2m0vkBCUuqAA9ABQbhpWcUcUckx/szWnIfa3Jt9uM12IiXJ98t/fHTzkH7RCUaAPTZBO9aNX4fxzz6z5CzPuV7kXaEXB7TEkcpStHny9PdVrwI6b8djpUbjb1K8DM8yx7D7I1ecgneyQ3nEtNqDallSlAkAJSCfAE/SoxY+NvDe83iJaYF9WqXLdSyylcR1AUtR0BzKSANnp1qRY1KUoFKUoFKVlPtF8XstiZ9MxrHrk7aYVtKW1qY0HH3CkKJKvEAb0ANfE78g1ZSsw8JOLOTZDgmbWS8z3nrjAx+XPhXBB5HkBLZBBUnXUKUkhXj49egqlf5ws+/rxk3/ALq//wBVRuPoRSo9wykSJfDfGJct92RIes8Rx111ZUtxamUEqUT1JJJJJqQ1IUpSgUpSgUpSgUpSgUpSgUpSgUpSgUpSgUpSgUpSg6d8nptVlnXRbLjyYcZyQptse8sISVaHqdaqEYbxjwvJJbcJMl+2y3FcrbU1AQFnegAoEp2fgSCasF5tDzS2nUhba0lKknwIPiKxpxXwO4YRkDrC2nHLW8smFK1tKknqEk/lgdCPTfhVppuLYyulbrnarsUWtZ2VgxTetUxNH7vo1bxGyFOK4Vc74eUuR2dMpPgp1R5UD5cxG/TdYjkvvSZLsmQ4p151ZW4tR2VKJ2SfUmrHu+a3bLeFlqxRZfmXVq5pbATtbkhoIPd78ydkj+yCetWDwx4EQ4zTVyzM+0yDpSYDa/vaPhzqHVR9B0+dWmJ7vTLVU3p60z/MQodRi/rl+iMaOpEb7zyiZ57+LzOzLmFpsWP3mBe5rUCMmQmQ088rlQtSk8qkj4q0hJ0OpG/hXv8AEDiLwhyW3Ktt2XJuKf6N5iIpLjR+KFKAI/2HzBqzL7idju2KP405BZj291HKlthsIDRH2VJAGgQQKyPxEwDIMJuCmrjHU9CUrTE1pJLTg8tn8VX5p+mx1rBixjZuRVcmZpq7I3/Dbz6s3S8SizTTTXREbTMxPzjfl4vZxnCcnyWy3OPhl2TNsqZf3yM4/wBwtagPdUts9N6PxI6enTwMhwDMrA2Xbrjs1lpP2nUJDqE/NSCQP21KOzTfHbXxLjwOdXs9zaWw4nfTmCStB+e06/tGtZVnzNRvYV/obRMTx8f75NPTtGxtUxYu9Kaao3jnvEdvCJ47ce98/wCla9znhbh2ZIfeYbZgXIHRlw9dFf4xA6K+uj61mfP8KvmFXUwrsxtpZ+8SW9lp4eh8j8Qeo/YasMPUrWV1Y4Vd0qfUtDyMDrT1qO+Pr3eni93gBlC8b4hRG3HCmFclCJITvptR0hX0UR9Ca19WAULU2tK0KUlaTtKgdEH4it42CaLlYrfcQQRKjNvAjwPMkK/+6p9esxTXTcjt4fw6T2Ryqq7Vdif28Y8/8+bu1DrxxS4e2mYqJOy22IfQSlaG3O85SPEHkB0fQ1RXap4qTn7zIwWwS1x4UYclyeaVpT7hHVrY/FSOh+J2D0HWhrDZbtfrim32W2yrhLUOYNR2itWvMnXgOo6npXPbuwfQjGsmx7JYypFgvMK5No+37O6FFH6Q8U/UVgfiR+ETJP1tK/jKr2GbbxC4V32FkD1quNndQ4Ah1aD3To8S2oj3SCB1TuoxktxF4yO53YNd0Jst2SG975edZVrfnrdBp/hbg0DiD2Y7XYpr64zgkvvRpCU8xZdDzgCteY0SCNjofEHRqqsE4Pzrrxfk4w4+ibarNJT905rSCGyBolsb/GJ2nXlonyrQPZWG+CFnH+Nk/wAddS+7v2Ph/hNyubEVqNDhMuSVpT4vOH8pR6qWtRA5iSSTQZl7YGWC7ZzGxmI5/ella04EnoX3ACfQ8qeUehKqpKO87HfbfYcU062oLQtJ0UqB2CD8d12LrOl3e7yrjLWXpk19bzqgOqlrUSf3mppxk4dSeH67AHipX3RtyXXtnfJJTrvUD0HMj9tBsHA82tt94aW/MJ0uPEYXHBmOOLCUMuJPKsEnwHMDr0IrkOJfD3f/AH1sH+nt/wDOqB7I98iXGLkHDe8achXJhb7LZ/G2nkdSPmnlI/RJqkszsMvGMquWPzQe+gyFNFWtc6R9lQ9FJ0R86bj6L1/FqShClrUEpSNkk6AHxqu+zrlv8ruF1vffd550AexS9nZKkAcqj+kgpO/iT8K6Xaey3+S/C6XHjuhE67n2JjR6hKh98V9EbG/IqFSJN/OZw9/rrYP9Ob/51njtC2vhpe8zfutuzyHbrq+00uUw7DkvMO8zaVNuIcabUBtBSemwfHod1VfCzFHs0zy2Y+2Fhp93mkrT4tsp6rV6HQ0PUipB2mGGYvGu+xo7aWmWkRENoSNBKRFZAA+lQLL4T2DC7dwn4iTLBkicgu33BkNzHURHWG47amXSlCe8SCrmKCSfzR0Hnm2rx7OX4LeLv6kH8CVVHUH0I4UfgtxP9SQ/4CK72TZTjmMspdv97g21K/sB94JUv9FPir6Cq2vWfN8PuztjF0aS27cpFnhR4DS+qS4Y6TzKH5KQCT8eg6brH99u9zvt0ful4nPzZj6uZx55WyfT0A8gOg8qDeNk4n8P7zNTCt2WWxyQsgIbW53ZWT4BPOBs+gr2chyjHMdUym/Xy32xT4JaEqQlvnA1vWz11sftrCzPDLiA9avuo3iF3VFKeYK9nPMU63sI+0R9K6mU5fechsNmtF5cXIXZu+bZfcUS4W1lGkK31PKUnR+BA8qbjdtjzPEr7O9hs2SWq4SuUr7mPKQ4vlHidA+Fe9WM+x/+GBP6vf8A+Gta5bktmxW1puV8lmOwt5DDYS2pxbrivsoQhIKlKOj0A8AT5VI9elRD+cvCk4w5kbt6DNvbkmIsusOIdD+ge67sp5yvRB0B4dfCovxI4nRH+EORZDgt6CLlbFx0K542nY6lvtpIU06nptJUASNeOvCgtelRDhjlkfIbFbokiYqRe2rPBmXD71yDmfZCwroAnqeY6T4elc5PEbDo2LtZLJu6Wbc8+uMypTK+d11KikoSgDmUdpPgPXwoJZSq8yLibZVYG7kNgvlujkTUwg5cor/uObSVoDKUhxa+Q7CRoHYJIG67HDnPI17xW5Xm83myAwHVGUIqXmkxWwBrvA8AvmOlHegPIb0SQndKiOMcScMyOauHbLufaEsl9LciO5HLjQ3taO8SnmT0Ph4edcsU4i4llFzFts1weekLaU80HIjrSXm0nRWhS0gKAJHgfOgllKUoFKUoFKUoFKUoFUvxw4sW60rk4vbrdCu8oDllGWjvGGj+SU/jKH7B89irayGTJhWC4zITDkiSxFddZZbTzKcWlBKUgeZJAGqytifCLN8nuff3OE/ao7qyt+VOSUrJJ2SEH3io+oA9atdMs2Kpm7fnaKfVQ65k5VNNNjFpmaqu3blHpx8X4cM8jkYnd05xLtUWRb3pKoK0tMpQpslIWota0EkAj5gkb861XjV/tGSWpu52aa1LjL80nqk/kqHik+hqs+MeCQIHBI2uysEIsy0y076rXrYcUo+Z0pSj8qzpi+SXvGLiJ9juL0N7pzcp2lwDyUk9FD5irCrGo1Sibtudqonby7FPRnXdCuU496OlRMb8OcTPPbvbqrhIZZkMrYkNNvNLGlIWkKSofAg+NUHinaISG0s5PZFlY8ZEBQ6/NtR6f530qf27jLw7mpH/AG77MvWyh+M4nX15dfvqnu6dk2p40T5cfR0VjWcHIjq3I+E8PV68bh3hUW8x7xEx+LFmxnO8acjlTQSr9FJCT8iNVKHE87akbI5gRseIqEyOLXDtlouKyaOoDyQ04o/sCd1FMi7QOKw0KTZoM66Pa90qT3Lf7TtX+rSMXLvzG9Mz8d/qmrP0/FpnaumO3ht6Q97hPw1TgE27TF3tc8TAkAKb7sISkk7UeY8yuvj08/jVe9oTifZrpbnsTsjUe4grSX5pAUhsg+DR81fnDpokDe+lf59xTyvL0riyZSYVuV0MSLtKVD84+KvqdelQWuhxdMrm77/Jnepx2frtqmx+kwadqOPGfHntv9fkVuPB2l2/ALGzIHvxrVHS5r4paSD4/KsZ4bZnchyq2WVlKlGXJQ2rlPVKN7Wr6JBP0rc6EIQ2ltCQEJHKB8BWr7QXI6lHxlvex9mf+t2eXCPrP0fNy7Tn7ndZdylK5n5b633T8VLUVH95ravZjxq32HhTbJkZtJl3VHtcp7XvKKvsp+SUgDXx2fOsf8QsffxXNbtYH21IMOStDe/xmydoV9UlJ+tXf2ceNdosVgbxHL31RWIxV7DN5CpAQTvu162Rok6OtaOjrXXmods0nf7TAvtml2i6R0yIctpTTravMEeXwI8QfI187skt4tOQ3K1BzvBCluxwv8rkWU7/AHVr7iVx7w6xWN8Y7cmrzdnEKTHQwCW21EdFrURrQPkNk+HTxrG0l52TIdkPuKcedWVuLUdlSidkn60kbY7Kv4EbN/5sn+OuoP20Mt9mtNtw2K7pyWr2yYAf6NJ02kj4FWz/AGBU27LTiGuBlpddWEIQuSpSidAAPL2aydxYyleZcQLtf+Ylh54oig7HKyn3UdD4e6AT6k0Hn4Pc7fZcutd3ukJydFhSEvrjoWElwp6pGz5cwG/TdWhxu4yWXiNirVqTjcqFLjyUvsSFyEqCehCkkAeBB/aBXa4O8BUZvhTOR3K9yLaJLqxHabYC+ZtJ5eYkkeKgr6AfGpl/csWn+t87/Q0/9VBnPB8gk4rl1ryGJsuQZCXSkHXOjwWjf5ySR9auvte49Gl/cPiJaOV2Fc2EMvOoHRR5edle/PmRsb/MFUzxCxqRiGaXTHJKy4qE+UocI13jZAUhWvVJB+taA4IvNcTOAl64fTXEmfbklEVSvxUklbCvosFJ/NAHnQQ3sg5YbNxAdx6Q4REvTfIgE9EvoBUg/UcyfUlNef2rMuGR8THbbGd54NkSYiNK2C7vbqvnvSf7FVcw7Pst5bebLkSfAkBSSR7zTqFbHQ+YUP3V3sVs1xzDMIVnjuKcm3KSEqdX7xGztbivjocyj8jQaU7G2G+wY7NzKYyBIuKjHiFQ6pYQfeI/SWNf+mKp3tRfh0yL/Jv91ara9jtkSy2aFaIDfdxYbCGGU/BKQAPr0rFHai/DpkX+Tf7q1QSbs5fgt4u/qQfwJVUdV49nL8FvF39SD+BKqjqC2u0FcXXLBw2tBKu6j4nEkgeXM4gJP7mhXc7I2MW+/cRX7hcW0PItMb2hlpYBBdKglKiD4hPvH58prt9oDHX1cMOG+VMtczKLDFgyFgdUnuUrb36Hbn1+dQLg1nb/AA9zRm9JaXIhuNliYwk6LjR0em+nMCAR8tedBvqsldsvGrdacutV9gtIZcu7LvtKEAAKcaKPf0PMhY2fPl+dXixxt4Yu2gXI5Qw2nl2WFtLDwPw5NbJ+Wx61lbjtxFXxFy1E2Oy7HtcNvuYTLuufRO1LVrzUddNnQApIkPY//DAn9Xv/APDWl+MVqXeMbixUY1NvvJNQ8BCnJiyIikpVyvtKUQCoEga34KJ8qzR2P/wwJ/V7/wDw1q7OMrtmIWpmfcm5b5kyURIseIz3j0h9e+VtA6DZ5T4kCkCqouNcS1WuyZDcoCrtcLDeXpEW2zpLIkvxFthCe8dT7hdTokE+nw1Xm8T8ZzHIcYzfKJWLvW+VcIcGDDtUZQlSXktykLU6sN7BOvADZCQd+HW1rdxCs8v7modgXiBIuE9VvbjzYZZcbeS2HCFAnw5SDzDYNfpkfEDHcfkXlm6OyGjZ4jUuUoNbHI6vkQE9eqirpr1qRXuCWzNsTnQLnCxJ26tXXGrXGcSqSiMqFIYZCCl1K/eA69dAka1rfSvJgYxl2JYdieWy7M1MnYxJuT062F0ArbfWo940RscwGiB4kHXjUyyfi37HhF1vEDFckj3CG2kpYuNqWlKCtKyhxzlVru/cIKgrodA63XcvGfYxOwtqTf7HfA3PkCNHtj1tcTJmOBKV7ab8VJ6j3t66a3UDw7uzluTnGuIVvxWN31qnuyGLT90GlGdFeYQgP94naO8GiU9fs66+VedkPD/LM6h5pdZttYx2VeYsWPCguPpcU57O4HOZ5SOm1aCRo9Brfh1l8DiZh1uwu4z0w7hao+PBhiXa3YfdSYiVlKGh3e9cvvDRB1oGv0hcWMelXh21ptmQtyDHckQe9tq0/dJCE8yjGB6udOoGhvyqRDcbxG9y8jt9zuWFXptVriP6N4ycyx3i2inumU7UORX2STyjRB8tV3+ElkzCzZY1Has94smKIir7yBdLgxLSy8dcqY6k7WEjrvZ0dn0r0eH/ABbj3ew3W6ZJbJ9pj29UhxyWuA43GDSHQhKOck7e94AoHXYOh5V/Me4nMS8paauCb5FRdV91aLbIsxjFxISVF3vFqPeb15EAcydjrugtKlQ9PEfGl4jb8mbckrjXCYmDGYDWn1yFLKO65CRpWwdgnwG6866cXcXgXCYyYl7lQID5jzbrGt63IcZwEApW4OvTfXQI/aNhYNKrq6ZnbMfy3IrpdMllu2qDaoskwkRUqaaDi+VK0OA7WVnQ1oAb8fhI8MyyPk3tSEWa92l+KG1OMXSGWFlK+blKepSoe6fAnVBIqUpQKUpQKUpQcH2mpDDjDyEuNOJKFoUNhSSNEGsY8WcMk4Tlj1vUlaoLxLsJ4g6W2T9nf5SfA/Q+YraNeBnuJWnMrC5arq3+cw8ke+wvyUk/7R5irHTc79Jc3n/zPP7qbWtKjULO1PCunl9vNh6lSziHgGQYTOU3coxdhKVpia0klpweWz+Kr80/TY61E67S3couUxVRO8PML1i5Yrm3cjaYKUpX2xFK/qUqUoJSCpROgAOpNXZwc4LzLhJZveXxVRoCdLaguDTj58ucfip9D1PoPHXycq3jUdOufy3cHAvZtyLdqPPsj4ve7L2Duw4zmZXJkocktlqAhY0Q2ftOf2taHps+Bq9a4tIQ02lttCUIQAlKUjQSB4ACuVcPlZNWTdm5V2vVMDCowrFNmjs+c9sqx448I7dxFiNzI7yLffYyORmSU7Q6jx7twDrrZ6EdRs9D4VmK98FOJlqkqZVjEiYgK0l2GtLqF+o0dgfMCt10rXbjIXC3s9ZNdrszKzCMbRaW1BTjRcBffA/FASTyA+ZOj8B510s54H8R5ma32XaMWSbc/cZDkQpmxkAtKcUUaSXAQOUjoQCK2VSo2FG2zFc/svZmGIW6yKORSFPR3GUy2R3TTjq1KVz84SdoOuhJ2odOhqkmOAfFVx9ttzGUsoUoBTip8YhAJ8SA4Toeg3W36VI6GO2qLYrDAs0JPLGgx0R2/iUpSBs+p1uu/SlBn/tQcKcgy++2y/YnbUzZXcKjzUe0NtHSTttXvqAP2lA9d9E1HOAXDvilg3EaJcp2NqatchCo04idHVptXUK0HNnlUEnoCdA68a1HSgyxx44JZbdOIs284hZkzYNwAkO6kstd28eixpakk7I5t9ftGpP2YuEt8xK93DIcttwhzUtCPBa75t3QV1WvaFEA9AkdfNVaApQKyrx54ScQcn4r3q+WPH/a7fJ7juXvbGEc3Kw2hXuqWCPeSR1HlWqqUGceCvDPN8dwHiLa7xZPZZd5tYjwG/amV9853UhOtpWQnq4jqogdfQ1VX8w3Ff8Aqp/8hF//AErcdKbCJWLFY87hLaMRyeAlaU2eNEmRyoHlWhpIOlJOthQ6KB8RsGsz8QOztmNmnOOY2hN+tylEtlK0tvoHkFpUQCR06p8fgK2LSgwnY+C3Eq6zURk4xJhpJ956YQ02gfEknZ+gJqxOJHZ/vcHF8bt2H277sTmjJdu0rv2muZagyEABxSfdHKvQG/MnxrVFKjYZm7N/C3O8R4kJu+Q2L2KEIbrXe+1sOe8rl0NIWT5Hyq6+K1ll3/G27fGx+2X1BkJW7Hmylx+VISrS23EAlKwSOvw3UupUilYuB8Qo2OWqWZsWZdrPflXCDBmTlvpRFUjkLBfKeYkbJBI6V3V4nm8+8ZTe7zZMdmKu9uixWrauUss8qHCVtqXy75uUkhQAHMR5DdW7Sgpmx8PMv/kPmFgkOsW+Hc4iWLTbHLk7MbhqCSFffVJ2EqOugB1r9vPKsIy3KbZjtwuNls7dyx11bbdvXcXFMzGFtoSolxKQpC9pBHQjp1+FXHSgoy6cLsguPD7LYLVjx+03G7mKiIxGlPOqDbTyFq715Z0r7JIASNfHr0sLL8am3HOMLvMFthMeyvyVSFFXKpLbjPIAn49dbHpUxpQUurh5lk/BsjwCexbWLfNkvzIlzalqUouGQHm0La5BodNE7OvLdek/ZeJGQ5ZiVyv9tsUCJZJZdfEWWpxbyi2UlY2kcqfDSep69T0FWtSgq2y8M5cLi5JvrkltWNNvuXODB3/g57yUocWR8AAoj4FXTWqiz/CW+wXbtbYeP45eI06a4+xcZ06Q2plDitlLjKeiyn4gjfSr7pQVXdMFuzV1vrsKz2a5QZVkg25iHLeW204GVnnSftKT7p907OiBs9K7/BnF8lxpy7JuyhEtTxaFutYuK5oiBKSF8ri0ghJ6aT11qrFpQKUpQKUpQKUpQKUpQflLjR5kZyLLYakMOJ5VtuoCkqHwIPQ1WeT8DMKuzinoKJNneUdn2Ve2yf0Fb0PROqtGlZrORdszvbqmGtkYljJja9RFXxZ8e7ODneq7nLkd3v3eeB1H7HK7dr7OUNDnNc8ofeR+RHihs/5ylK/2VfFK251bLmNun8o+yuj2e06J39385+6IYdw1w/FVpftlqQ5LT4SpJ710eoJ6J/sgVL6UrRuXK7k9Kud5Wtqzbs09C3TER4FKUr4ZSlKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUClKUH//Z" alt="d'Avila" class="logo-img">
+    <div class="logo-tagline-header">Orçamentos · Orca</div>
+  </div>
+  <div class="header-right">
+    <span class="badge-status" id="status-badge">● Aguardando login</span>
+    <nav class="header-nav" id="header-nav" style="display:none">
+      <button class="nav-btn active" id="nav-propostas" onclick="showSection('propostas')">📋 Propostas</button>
+      <button class="nav-btn" id="nav-cadastros" onclick="showSection('cadastros')">🏢 Cadastros</button>
+      <button class="nav-btn" id="nav-admin" onclick="showSection('admin')" style="display:none">⚙️ Administração</button>
+    </nav>
+    <div class="nav-sep" id="nav-sep" style="display:none"></div>
+    <div class="user-info" id="user-info" style="display:none">
+      <div class="user-avatar" id="user-avatar">—</div>
+      <div><div class="user-name" id="user-name">—</div></div>
+      <span class="user-role" id="user-role-badge" style="display:none">Admin</span>
+      <button class="btn-logout" onclick="logout()">Sair</button>
+    </div>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-title">Sistema de Orçamentos</div>
+      <div class="login-sub">Versão compartilhada 1.16 — 09/jun/2026</div>
+    </div>
+    <div class="login-body">
+      <div class="login-error" id="login-error"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>E-mail</label><input type="email" id="login-email" placeholder="seu@email.com.br" autocomplete="email"></div>
+        <div class="form-group"><label>Senha</label><input type="password" id="login-senha" placeholder="••••••••" autocomplete="current-password"></div>
+      </div>
+    </div>
+    <div class="login-footer"><button class="btn btn-primary" style="width:100%" onclick="login()" id="btn-login">Entrar</button></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+
+  <!-- PROPOSTAS -->
+  <div id="section-propostas" class="app-inner">
+    <div class="page-header">
+      <div class="page-title">Propostas <span id="titulo-aba">Ativas</span></div>
+      <button class="btn btn-primary" onclick="abrirNovaPropostaModal()" id="btn-nova-proposta">+ Nova Proposta</button>
+    </div>
+    <div class="stats-bar" id="stats-bar">
+      <div class="stat-card"><div class="stat-icon">📝</div><div><div class="stat-val" id="stat-elaboracao">—</div><div class="stat-lbl">Em Elaboração</div></div></div>
+      <div class="stat-card"><div class="stat-icon">📤</div><div><div class="stat-val" id="stat-emitida">—</div><div class="stat-lbl">Emitidas</div></div></div>
+      <div class="stat-card"><div class="stat-icon">📞</div><div><div class="stat-val" id="stat-followup">—</div><div class="stat-lbl">Follow-up</div></div></div>
+      <div class="stat-card"><div class="stat-icon">🔄</div><div><div class="stat-val" id="stat-revisao">—</div><div class="stat-lbl">Em Revisão</div></div></div>
+      <div class="stat-card"><div class="stat-icon">⏸️</div><div><div class="stat-val" id="stat-suspensa">—</div><div class="stat-lbl">Suspensas</div></div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchPropTab('ativas')" id="tab-ativas">📋 Ativas <span class="tab-count" id="count-ativas">0</span></button>
+      <button class="tab" onclick="switchPropTab('conquistadas')" id="tab-conquistadas">🏆 Conquistadas <span class="tab-count" id="count-conquistadas">0</span></button>
+      <button class="tab" onclick="switchPropTab('encerradas')" id="tab-encerradas">📁 Encerradas <span class="tab-count" id="count-encerradas">0</span></button>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Proposta</th><th>Emitente</th><th>Cliente</th><th>Objetivo</th><th>Status</th><th>Criada em</th></tr></thead>
+        <tbody id="tabela-propostas"><tr><td colspan="6"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CADASTROS -->
+  <div id="section-cadastros" class="app-inner" style="display:none">
+    <div class="page-header">
+      <div class="page-title">🏢 <span>Clientes e Fornecedores</span></div>
+      <button class="btn btn-primary" onclick="abrirModalPessoa()">+ Nova Pessoa</button>
+    </div>
+    <div class="filter-bar">
+      <input class="filter-input" type="text" id="filtro-pessoa-texto" placeholder="🔍  Buscar por nome ou documento…" oninput="renderPessoas()">
+      <select class="filter-select" id="filtro-pessoa-tipo" onchange="renderPessoas()">
+        <option value="">Todos</option>
+        <option value="cliente" selected>Clientes</option>
+        <option value="fornecedor">Fornecedores</option>
+        <option value="ambos">Cliente e Fornecedor</option>
+      </select>
+      <select class="filter-select" id="filtro-pessoa-ativo" onchange="renderPessoas()">
+        <option value="true">Ativos</option>
+        <option value="false">Inativos</option>
+        <option value="">Todos</option>
+      </select>
+    </div>
+    <div class="split-layout">
+      <div class="split-list">
+        <table class="data-table">
+          <thead><tr><th>Tipo</th><th>Nome / Razão Social</th><th>Documento</th><th id="th-emitente-pessoa" style="display:none">Emitente</th><th>Classificação</th><th>Situação</th><th style="text-align:right">Ações</th></tr></thead>
+          <tbody id="tabela-pessoas"><tr><td colspan="6"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr></tbody>
+        </table>
+      </div>
+      <div class="split-panel hidden" id="painel-pessoa">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title" id="painel-pessoa-nome">—</div>
+            <div class="panel-subtitle" id="painel-pessoa-doc">—</div>
+          </div>
+          <button class="panel-close" onclick="fecharPainel()">✕</button>
+        </div>
+        <div class="panel-body" id="painel-pessoa-body"></div>
+        <div class="panel-footer">
+          <button class="btn btn-ghost btn-sm" onclick="editarPessoaSelecionada()">✏️ Editar</button>
+          <button class="btn btn-ghost btn-sm" onclick="abrirModalContato()">+ Contato</button>
+          <button class="btn btn-sm" id="btn-toggle-ativo-pessoa" onclick="toggleAtivoPessoa()">🚫 Inativar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMINISTRAÇÃO -->
+  <div id="section-admin" class="app-inner" style="display:none">
+    <div class="page-header">
+      <div class="page-title">⚙️ <span id="admin-subtitulo">Usuários</span></div>
+      <button class="btn btn-primary" id="btn-novo-admin" onclick="abrirModalNovoAdmin()">+ Novo Usuário</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchAdminTab('usuarios')" id="admtab-usuarios">👥 Usuários</button>
+      <button class="tab" onclick="switchAdminTab('emitentes')" id="admtab-emitentes">🏛️ Emitentes</button>
+      <button class="tab" onclick="switchAdminTab('numeracao')" id="admtab-numeracao">🔢 Numeração</button>
+    </div>
+    <div id="admin-usuarios">
+      <div class="info-box"><strong>Como cadastrar um novo usuário:</strong><br>1. Acesse o painel do Supabase → <strong>Authentication → Users → Add user</strong><br>2. Informe o e-mail e defina uma senha temporária — ou use <strong>Send invite</strong><br>3. Copie o <strong>UUID</strong> gerado e volte aqui para cadastrar os dados do sistema</div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Sigla</th><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Emitentes</th><th>Situação</th><th style="text-align:right">Ações</th></tr></thead>
+          <tbody id="admin-usuarios-body"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="admin-emitentes" style="display:none">
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Logo</th><th>Prefixo</th><th>Nome Fantasia</th><th>CNPJ</th><th>Regime</th><th>Compartilha</th><th>Situação</th><th style="text-align:right">Ações</th></tr></thead>
+          <tbody id="admin-emitentes-body"><tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="admin-numeracao" style="display:none">
+      <div class="info-box">
+        <strong>Para que serve esta configuração?</strong><br>
+        O Orca gera números sequenciais por grupo de emitentes e por ano. Se sua empresa já emitiu propostas em planilhas antes de migrar para o Orca, configure aqui o <strong>último número já utilizado</strong> em cada grupo. A próxima proposta criada no sistema virá com o número seguinte.<br><br>
+        <strong>Exemplo:</strong> Se a d'Avila/Ecobiota já emitiu 47 propostas em 2026, informe 47. A primeira proposta no Orca será a AMB-ORC-26048.<br><br>
+        <strong>Atenção:</strong> O ajuste só é possível enquanto o grupo não tiver propostas no Orca para o ano em questão. Após a primeira proposta criada no sistema, o contador passa a ser gerenciado automaticamente.
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Grupo</th><th>Emitentes</th><th>Ano</th><th>Últ. nº fora do sistema</th><th>Próxima proposta</th><th>Propostas no Orca</th><th style="text-align:right">Ações</th></tr></thead>
+          <tbody id="admin-numeracao-body"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAIS -->
+
+<!-- Nova Proposta -->
+<div class="modal-overlay" id="modal-nova-proposta">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Nova Proposta</span><button class="modal-close" onclick="closeModal('modal-nova-proposta')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-group"><label>Emitente</label><select id="np-emitente"></select></div>
+        <div class="form-group"><label>Tipo de Cliente</label><select id="np-tipo-cliente"><option value="PR">Privado</option><option value="PU">Público</option></select></div>
+        <div class="form-group span2"><label>Cliente</label><select id="np-cliente"><option value="">— selecione —</option></select></div>
+        <div class="form-group span2"><label>Objetivo</label><textarea id="np-objetivo" rows="2" placeholder="Descrição resumida do objeto contratado…"></textarea></div>
+        <div class="form-group"><label>Data de Início Estimada</label><input type="date" id="np-data-inicio"></div>
+        <div class="form-group"><label>Prazo de Vigência (dias)</label><input type="number" id="np-prazo" placeholder="ex: 365" min="1"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-nova-proposta')">Cancelar</button><button class="btn btn-primary" onclick="criarProposta()">Criar Proposta</button></div>
+  </div>
+</div>
+
+<!-- Pessoa -->
+<div class="modal-overlay" id="modal-pessoa">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modal-pessoa-title">Nova Pessoa</span><button class="modal-close" onclick="closeModal('modal-pessoa')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-section-title">Identificação</div>
+        <div class="form-group">
+          <label>Tipo de Pessoa</label>
+          <select id="pe-tipo" onchange="atualizarDocLabel()"><option value="PJ">Pessoa Jurídica (PJ)</option><option value="PF">Pessoa Física (PF)</option></select>
+        </div>
+        <div class="form-group"><label id="pe-doc-label">CNPJ (14 dígitos)</label><input type="text" id="pe-doc" placeholder="00000000000000" maxlength="14"></div>
+        <div class="form-group span2"><label id="pe-nome-label">Razão Social</label><input type="text" id="pe-nome"></div>
+        <div class="form-section-title">Classificação</div>
+        <div class="form-group span2">
+          <div class="checkbox-row"><input type="checkbox" id="pe-cliente" checked><label for="pe-cliente">Cliente — pode ser associado a propostas</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="pe-fornecedor"><label for="pe-fornecedor">Fornecedor — pode ser associado a elementos de custo</label></div>
+        </div>
+        <div class="form-section-title">Endereço</div>
+        <div class="form-group span2"><label>Logradouro</label><input type="text" id="pe-logradouro" placeholder="Rua, Avenida…"></div>
+        <div class="form-group"><label>Número</label><input type="text" id="pe-numero"></div>
+        <div class="form-group"><label>Complemento</label><input type="text" id="pe-complemento" placeholder="Sala, Apto…"></div>
+        <div class="form-group span2"><label>Bairro</label><input type="text" id="pe-bairro" placeholder="Bairro"></div>
+        <div class="form-group"><label>Cidade</label><input type="text" id="pe-cidade"></div>
+        <div class="form-group"><label>UF</label><input type="text" id="pe-uf" maxlength="2" style="text-transform:uppercase"></div>
+        <div class="form-group"><label>CEP</label><input type="text" id="pe-cep" maxlength="8"></div>
+        <div class="form-section-title">Contato</div>
+        <div class="form-group span2"><label>Telefone</label><input type="text" id="pe-telefone" placeholder="(79) 99999-9999"></div>
+        <div class="form-group span2"><label>Nome Fantasia / Nome Abreviado</label><input type="text" id="pe-nome-fantasia" placeholder="Nome como é conhecido comercialmente"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-pessoa')">Cancelar</button><button class="btn btn-primary" onclick="salvarPessoa()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Contato -->
+<div class="modal-overlay" id="modal-contato">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modal-contato-title">Novo Contato</span><button class="modal-close" onclick="closeModal('modal-contato')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-group span2"><label>Nome Completo <span style="color:var(--red)">*</span></label><input type="text" id="co-nome" placeholder="Nome do contato"></div>
+        <div class="form-group"><label>Cargo / Função</label><input type="text" id="co-cargo" placeholder="ex: Diretor de Projetos"></div>
+        <div class="form-group"><label>E-mail</label><input type="email" id="co-email" placeholder="contato@empresa.com"></div>
+        <div class="form-group span2"><label>Telefone</label><input type="text" id="co-telefone" placeholder="(79) 99999-9999"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-contato')">Cancelar</button><button class="btn btn-primary" onclick="salvarContato()">Salvar Contato</button></div>
+  </div>
+</div>
+
+<!-- Emitente -->
+<div class="modal-overlay" id="modal-emitente">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modal-emitente-title">Editar Emitente</span><button class="modal-close" onclick="closeModal('modal-emitente')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-section-title">Logotipo</div>
+        <div class="form-group span2">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div id="em-logo-preview-wrap"><div class="logo-preview-empty">🏛️</div></div>
+            <div style="flex:1">
+              <label>Arquivo de imagem (PNG, JPG — máx. 300KB)</label>
+              <input type="file" id="em-logo-file" accept="image/png,image/jpeg,image/jpg,image/gif,image/svg+xml" onchange="previewLogo(this)">
+              <span class="field-hint">O logotipo aparecerá na tela de administração e futuramente nos documentos exportados.</span>
+              <button class="btn btn-danger btn-sm" style="margin-top:6px" onclick="removerLogo()" id="btn-remover-logo" style="display:none">🗑 Remover logo</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-section-title">Dados Cadastrais</div>
+        <div class="form-group"><label>CNPJ (14 dígitos)</label><input type="text" id="em-cnpj" maxlength="14" placeholder="00000000000001"></div>
+        <div class="form-group"><label>Prefixo (3 letras maiúsculas) <span id="em-prefixo-obrig" style="color:var(--red);display:none">*</span></label><input type="text" id="em-prefixo" maxlength="3" style="text-transform:uppercase" disabled><span class="field-hint" id="em-prefixo-hint" style="display:none">Usado na numeração das propostas. Ex: XYZ → XYZ-ORC-26001</span></div>
+        <div class="form-group span2"><label>Razão Social</label><input type="text" id="em-razao"></div>
+        <div class="form-group span2"><label>Nome Fantasia</label><input type="text" id="em-fantasia"></div>
+        <div class="form-group"><label>Regime Tributário</label>
+          <select id="em-regime"><option value="Simples Nacional">Simples Nacional</option><option value="Lucro Presumido">Lucro Presumido</option><option value="Lucro Real">Lucro Real</option></select>
+        </div>
+        <div class="form-group span2"><label>Logradouro</label><input type="text" id="em-logradouro"></div>
+        <div class="form-group"><label>Número</label><input type="text" id="em-numero"></div>
+        <div class="form-group"><label>Complemento</label><input type="text" id="em-complemento"></div>
+        <div class="form-group span2"><label>Bairro</label><input type="text" id="em-bairro"></div>
+        <div class="form-group"><label>Cidade</label><input type="text" id="em-cidade"></div>
+        <div class="form-group"><label>UF</label><input type="text" id="em-uf" maxlength="2" style="text-transform:uppercase"></div>
+        <div class="form-group"><label>CEP</label><input type="text" id="em-cep" maxlength="8"></div>
+        <div class="form-section-title">Configurações</div>
+        <div class="form-group span2" id="em-compartilha-wrap">
+          <div class="checkbox-row"><input type="checkbox" id="em-compartilha"><label for="em-compartilha">Compartilha numeração e elementos de custo com a d'Avila</label></div>
+          <div class="warn-box" id="em-compartilha-aviso" style="display:none">⚠️ <strong>Atenção:</strong> após a emissão da primeira proposta, esta configuração torna-se irreversível.</div>
+          <div class="warn-box" id="em-compartilha-travado" style="display:none">🔒 Esta configuração está <strong>bloqueada</strong> pois o emitente já possui propostas emitidas.</div>
+        </div>
+        <div class="form-group span2">
+          <div class="checkbox-row"><input type="checkbox" id="em-ativo"><label for="em-ativo">Emitente ativo</label></div>
+          <span class="field-hint">Emitentes inativos não aparecem para seleção. Propostas existentes são preservadas.</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-emitente')">Cancelar</button><button class="btn btn-primary" onclick="salvarEmitente()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Numeração -->
+<div class="modal-overlay" id="modal-numeracao">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-numeracao-title">Configurar Numeração</span>
+      <button class="modal-close" onclick="closeModal('modal-numeracao')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Grupo</label>
+          <input type="text" id="num-grupo" disabled>
+        </div>
+        <div class="form-group">
+          <label>Ano</label>
+          <input type="number" id="num-ano" min="2020" max="2099">
+        </div>
+        <div class="form-group">
+          <label>Último número já utilizado fora do Orca</label>
+          <input type="number" id="num-inicial" min="0" max="998" placeholder="ex: 47">
+          <span class="field-hint">Informe quantas propostas já foram emitidas neste ano antes de usar o sistema. A próxima proposta terá o número seguinte.</span>
+        </div>
+        <div class="form-group">
+          <label>Observação (opcional)</label>
+          <input type="text" id="num-obs" placeholder="ex: Propostas emitidas em planilha antes da migração">
+        </div>
+        <div class="info-box" id="num-preview" style="margin:0">
+          A próxima proposta será: <strong id="num-preview-text">—</strong>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-numeracao')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarNumeracao()">Salvar Configuração</button>
+    </div>
+  </div>
+</div>
+
+<!-- Usuário -->
+<div class="modal-overlay" id="modal-usuario">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modal-usuario-title">Novo Usuário</span><button class="modal-close" onclick="closeModal('modal-usuario')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-section-title">Dados do Usuário</div>
+        <div class="form-group span2"><label>UUID do Supabase Auth <span style="color:var(--red)">*</span></label><input type="text" id="u-uuid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><span class="field-hint">Cole o UUID copiado do painel Authentication → Users</span></div>
+        <div class="form-group"><label>Nome Completo <span style="color:var(--red)">*</span></label><input type="text" id="u-nome"></div>
+        <div class="form-group"><label>Sigla (3 caracteres) <span style="color:var(--red)">*</span></label><input type="text" id="u-sigla" maxlength="3" style="text-transform:uppercase"></div>
+        <div class="form-group span2"><label>E-mail <span style="color:var(--red)">*</span></label><input type="email" id="u-email"></div>
+        <div class="form-section-title">Permissões</div>
+        <div class="form-group span2">
+          <div class="checkbox-row"><input type="checkbox" id="u-admin"><label for="u-admin">Administrador</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="u-criador" checked><label for="u-criador">Pode criar propostas</label></div>
+        </div>
+        <div class="form-section-title">Emitentes Associados</div>
+        <div class="form-group span2"><div class="emit-checklist" id="u-emitentes-list"><div class="loading" style="padding:10px"><div class="spinner"></div></div></div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-usuario')">Cancelar</button><button class="btn btn-primary" onclick="salvarUsuario()">Salvar Usuário</button></div>
+  </div>
+</div>
+
+<div class="block-overlay" id="block-overlay"><div class="spinner"></div><p id="block-msg">Processando…</p></div>
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const SUPA_URL='https://qxfqavhnojskrgmisqpm.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4ZnFhdmhub2pza3JnbWlzcXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MDg0OTcsImV4cCI6MjA5NjM4NDQ5N30.GY-lrgGRIlguVEehiSu7WlXXdHIJIMgmoEOEP1aujts';
+
+let sessionToken=null,currentUser=null;
+let currentPropTab='ativas',currentAdminTab='usuarios';
+let todasPropostas=[],todosEmitentes=[],todasPessoas=[];
+let pessoaSelecionadaId=null,editandoUsuarioId=null,editandoPessoaId=null;
+let editandoContatoId=null,editandoEmitenteId=null;
+let emLogoBase64=null,emLogoRemovido=false;
+// emitentesDoUsuario: [{id, prefixo, compartilha_davila}] — emitentes associados ao usuário logado
+let emitentesDoUsuario=[];
+
+// ── API ──
+const api=async(path,opts={})=>{
+  const r=await fetch(`${SUPA_URL}/rest/v1/${path}`,{
+    headers:{'apikey':SUPA_KEY,'Authorization':`Bearer ${sessionToken||SUPA_KEY}`,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',...opts.headers},
+    ...opts
+  });
+  if(!r.ok){
+    const t=await r.text();
+    // JWT expirado ou inválido — desloga automaticamente
+    try{
+      const err=JSON.parse(t);
+      if(err.code==='PGRST303'||err.message==='JWT expired'||(err.message||'').includes('JWT')){
+        logout();
+        showLoginError('Sua sessão expirou. Faça login novamente.');
+        throw new Error('Sessão expirada');
+      }
+    }catch(parseErr){if(parseErr.message==='Sessão expirada')throw parseErr;}
+    throw new Error(t);
+  }
+  const t=await r.text();return t?JSON.parse(t):null;
+};
+
+// ── AUTH ──
+async function login(){
+  const email=document.getElementById('login-email').value.trim();
+  const senha=document.getElementById('login-senha').value;
+  const errEl=document.getElementById('login-error');
+  errEl.style.display='none';
+  if(!email||!senha){showLoginError('Preencha e-mail e senha.');return;}
+  const btn=document.getElementById('btn-login');
+  btn.textContent='Entrando…';btn.disabled=true;
+  try{
+    const res=await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'apikey':SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password:senha})});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error_description||data.msg||'Falha no login');
+    sessionToken=data.access_token;
+    const u=await api(`usuarios?id=eq.${data.user.id}&select=id,nome,sigla,is_admin,pode_criar_proposta,ativo`);
+    if(!u?.length)throw new Error('Usuário não cadastrado no sistema.');
+    if(!u[0].ativo)throw new Error('Usuário inativo. Contate o administrador.');
+    // Reset completo do estado anterior antes de iniciar nova sessão
+    currentUser=null;todasPropostas=[];todasPessoas=[];emitentesDoUsuario=[];todosEmitentes=[];
+    // Garante que nav-admin volta ao estado oculto antes de iniciarApp decidir mostrá-lo
+    document.getElementById('nav-admin').style.display='none';
+    currentUser=u[0];iniciarApp();
+  }catch(e){showLoginError(e.message);btn.textContent='Entrar';btn.disabled=false;}
+}
+function showLoginError(msg){const e=document.getElementById('login-error');e.textContent=msg;e.style.display='block';}
+function logout(){
+  // Limpa estado
+  sessionToken=null;currentUser=null;
+  todasPropostas=[];todasPessoas=[];emitentesDoUsuario=[];todosEmitentes=[];
+  // Oculta app
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('user-info').style.display='none';
+  document.getElementById('header-nav').style.display='none';
+  document.getElementById('nav-sep').style.display='none';
+  // Reseta campos de login
+  document.getElementById('login-email').value='';
+  document.getElementById('login-senha').value='';
+  document.getElementById('login-error').style.display='none';
+  document.getElementById('status-badge').textContent='● Desconectado';
+  document.getElementById('status-badge').style.color='';
+  const btnLogin=document.getElementById('btn-login');
+  btnLogin.textContent='Entrar';btnLogin.disabled=false;
+  // Reseta interface para estado neutro — evita herança de sessão anterior
+  document.getElementById('nav-admin').style.display='none';
+  document.getElementById('user-role-badge').style.display='none';
+  document.getElementById('btn-nova-proposta').style.display='none';
+  // Força seção propostas ativa para próximo login
+  ['propostas','cadastros','admin'].forEach(s=>{
+    const el=document.getElementById('section-'+s);
+    if(el)el.style.display=s==='propostas'?'block':'none';
+    const nb=document.getElementById('nav-'+s);
+    if(nb)nb.classList.toggle('active',s==='propostas');
+  });
+  // Reseta aba admin para usuários (evita herdar aba emitentes/numeração)
+  currentAdminTab='usuarios';
+}
+document.getElementById('login-senha').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('login-senha').focus();});
+
+async function iniciarApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  document.getElementById('user-avatar').textContent=currentUser.sigla.trim();
+  document.getElementById('user-name').textContent=currentUser.nome;
+  document.getElementById('user-info').style.display='flex';
+  document.getElementById('header-nav').style.display='flex';
+  document.getElementById('nav-sep').style.display='block';
+  document.getElementById('status-badge').textContent='● Online';
+  document.getElementById('status-badge').style.color='var(--azul)';
+  // Garante início sempre na seção propostas
+  ['propostas','cadastros','admin'].forEach(s=>{
+    const el=document.getElementById('section-'+s);
+    if(el)el.style.display=s==='propostas'?'block':'none';
+    const nb=document.getElementById('nav-'+s);
+    if(nb)nb.classList.toggle('active',s==='propostas');
+  });
+  if(currentUser.is_admin){
+    document.getElementById('nav-admin').style.display='flex';
+    document.getElementById('user-role-badge').style.display='inline';
+  }
+  // Controla visibilidade do botão Nova Proposta conforme permissão
+  document.getElementById('btn-nova-proposta').style.display=currentUser.pode_criar_proposta?'':'none';
+  // Carrega emitentes associados ao usuário logado (com flag compartilha_davila)
+  try{
+    if(currentUser.is_admin){
+      emitentesDoUsuario=await api('emitentes?ativo=eq.true&select=id,prefixo,compartilha_davila')||[];
+    }else{
+      const assoc=await api(`usuarios_emitentes?usuario_id=eq.${currentUser.id}&select=emitentes(id,prefixo,compartilha_davila)`)||[];
+      emitentesDoUsuario=assoc.map(a=>a.emitentes).filter(Boolean);
+    }
+  }catch(e){emitentesDoUsuario=[];}
+  await Promise.all([carregarPropostas(),carregarEmitentesBase()]);
+}
+
+// ── NAVEGAÇÃO ──
+async function showSection(sec){
+  // Bloqueia acesso à seção admin para não-administradores
+  if(sec==='admin'&&!currentUser?.is_admin){
+    toast('Acesso restrito a administradores.','warn');return;
+  }
+  ['propostas','cadastros','admin'].forEach(s=>{
+    document.getElementById('section-'+s).style.display=s===sec?'block':'none';
+    const nb=document.getElementById('nav-'+s);
+    if(nb)nb.classList.toggle('active',s===sec);
+  });
+  if(sec==='cadastros'&&!todasPessoas.length)await carregarPessoas();
+  if(sec==='admin')switchAdminTab(currentAdminTab||'usuarios');
+}
+
+// ══ PROPOSTAS ══
+async function carregarPropostas(){
+  document.getElementById('tabela-propostas').innerHTML='<tr><td colspan="6"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr>';
+  try{
+    todasPropostas=await api('propostas?select=id,prefixo,ano,numero,revisao,status,objetivo,criado_em,emitentes(nome_fantasia,prefixo),pessoas(razao_social)&order=criado_em.desc')||[];
+    atualizarStatsPropostas();renderPropostas();
+    await carregarSelectsNovaProposta();
+  }catch(e){
+    document.getElementById('tabela-propostas').innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+  }
+}
+function atualizarStatsPropostas(){
+  const c=s=>todasPropostas.filter(p=>p.status===s).length;
+  [['elaboracao','em_elaboracao'],['emitida','emitida'],['followup','em_follow_up'],['revisao','em_revisao'],['suspensa','suspensa']].forEach(([k,s])=>document.getElementById('stat-'+k).textContent=c(s));
+  document.getElementById('count-ativas').textContent=todasPropostas.filter(p=>['em_elaboracao','emitida','em_follow_up','em_revisao','suspensa'].includes(p.status)).length;
+  document.getElementById('count-conquistadas').textContent=todasPropostas.filter(p=>p.status==='conquistada').length;
+  document.getElementById('count-encerradas').textContent=todasPropostas.filter(p=>['perdida','cancelada'].includes(p.status)).length;
+}
+function switchPropTab(tab){
+  currentPropTab=tab;
+  ['ativas','conquistadas','encerradas'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===tab));
+  document.getElementById('titulo-aba').textContent={ativas:'Ativas',conquistadas:'Conquistadas',encerradas:'Encerradas'}[tab];
+  document.getElementById('stats-bar').style.display=tab==='ativas'?'flex':'none';
+  document.getElementById('btn-nova-proposta').style.display=(tab==='ativas'&&(currentUser?.pode_criar_proposta||currentUser?.is_admin))?'':'none';
+  renderPropostas();
+}
+function renderPropostas(){
+  const filtros={ativas:['em_elaboracao','emitida','em_follow_up','em_revisao','suspensa'],conquistadas:['conquistada'],encerradas:['perdida','cancelada']};
+  const STATUS={em_elaboracao:'Em Elaboração',emitida:'Emitida',em_follow_up:'Follow-up',em_revisao:'Em Revisão',suspensa:'Suspensa',conquistada:'Conquistada',perdida:'Perdida',cancelada:'Cancelada'};
+  const lista=todasPropostas.filter(p=>filtros[currentPropTab].includes(p.status));
+  const tbody=document.getElementById('tabela-propostas');
+  if(!lista.length){
+    const msgs={ativas:['📋','Nenhuma proposta ativa','Crie uma nova proposta para começar.'],conquistadas:['🏆','Nenhuma proposta conquistada',''],encerradas:['📁','Nenhuma proposta encerrada','']};
+    const[icon,title,sub]=msgs[currentPropTab];
+    tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-title">${title}</div><div class="empty-sub">${sub}</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML=lista.map(p=>{
+    const num=`${p.prefixo}-ORC-${String(p.ano).slice(-2)}${String(p.numero).padStart(3,'0')}`;
+    return `<tr class="clickable${p.status==='suspensa'?' suspensa':''}" onclick="abrirProposta('${p.id}')">
+      <td><span class="prop-num">${num}</span><span class="prop-rev">REV${String(p.revisao).padStart(2,'0')}</span></td>
+      <td><span class="emit-tag">${escHtml(p.emitentes?.nome_fantasia||p.emitentes?.prefixo||'—')}</span></td>
+      <td style="font-weight:600">${escHtml(p.pessoas?.razao_social||'—')}</td>
+      <td><div class="obj-text" title="${escHtml(p.objetivo||'')}">${escHtml(p.objetivo||'—')}</div></td>
+      <td><span class="status-pill s-${p.status}">${STATUS[p.status]||p.status}</span></td>
+      <td><span class="date-text">${new Date(p.criado_em).toLocaleDateString('pt-BR')}</span></td>
+    </tr>`;
+  }).join('');
+}
+async function carregarSelectsNovaProposta(){
+  try{
+    // Emitentes: admin vê todos; não-admin vê só os seus
+    let emits;
+    if(currentUser.is_admin){
+      emits=await api('emitentes?ativo=eq.true&select=id,nome_fantasia,prefixo&order=nome_fantasia')||[];
+    }else{
+      const ids=emitentesDoUsuario.map(e=>e.id);
+      emits=ids.length
+        ?await api('emitentes?ativo=eq.true&id=in.('+ids.join(',')+')'+'&select=id,nome_fantasia,prefixo&order=nome_fantasia')||[]
+        :[];
+    }
+    if(emits.length) todosEmitentes=emits;
+    const sel=document.getElementById('np-emitente');
+    sel.innerHTML='<option value="">— selecione —</option>';
+    emits.forEach(e=>{
+      const o=document.createElement('option');
+      o.value=e.id;
+      o.textContent=e.nome_fantasia||e.prefixo;
+      sel.appendChild(o);
+    });
+    // Clientes: mesma lógica de filtro por emitente
+    let filtroC='';
+    if(!currentUser.is_admin){
+      const ids=emitentesDoUsuario.map(e=>e.id);
+      const pool=emitentesDoUsuario.some(e=>e.compartilha_davila);
+      if(ids.length>0 && pool){
+        filtroC='&or=(emitente_id.in.('+ids.join(',')+'),emitente_id.is.null)';
+      }else if(ids.length>0){
+        filtroC=ids.length===1?'&emitente_id=eq.'+ids[0]:'&emitente_id=in.('+ids.join(',')+')';
+      }else if(pool){
+        filtroC='&emitente_id=is.null';
+      }else{
+        const selC=document.getElementById('np-cliente');
+        selC.innerHTML='<option value="">— sem clientes disponíveis —</option>';
+        return;
+      }
+    }
+    const cli=await api('pessoas?is_cliente=eq.true&ativo=eq.true&select=id,razao_social,nome_fantasia&order=razao_social'+filtroC)||[];
+    const selC=document.getElementById('np-cliente');
+    selC.innerHTML='<option value="">— selecione —</option>';
+    cli.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id;
+      o.textContent=c.razao_social+(c.nome_fantasia&&c.nome_fantasia!==c.razao_social?' ('+c.nome_fantasia+')':'');
+      selC.appendChild(o);
+    });
+  }catch(e){console.error('carregarSelectsNovaProposta:',e);}
+}
+function abrirNovaPropostaModal(){
+  if(!currentUser?.pode_criar_proposta&&!currentUser?.is_admin){
+    toast('Você não tem permissão para criar propostas.','warn');return;
+  }
+  openModal('modal-nova-proposta');
+}
+async function criarProposta(){
+  const eid=document.getElementById('np-emitente').value;
+  const cid=document.getElementById('np-cliente').value;
+  if(!eid){toast('Selecione o emitente','error');return;}
+  if(!cid){toast('Selecione o cliente','error');return;}
+  blockUI('Criando proposta…');
+  try{
+    const num=await api('rpc/gerar_numero_proposta',{method:'POST',body:JSON.stringify({p_emitente_id:eid})});
+    const em=await api(`emitentes?id=eq.${eid}&select=prefixo`);
+    const nova=await api('propostas',{method:'POST',body:JSON.stringify({
+      emitente_id:eid,cliente_id:cid,
+      tipo_cliente:document.getElementById('np-tipo-cliente').value,
+      prefixo:em[0].prefixo,ano:new Date().getFullYear(),numero:num,revisao:0,
+      status:'em_elaboracao',
+      objetivo:document.getElementById('np-objetivo').value.trim()||null,
+      data_inicio_estimada:document.getElementById('np-data-inicio').value||null,
+      prazo_vigencia_dias:parseInt(document.getElementById('np-prazo').value)||null,
+      criado_por:currentUser.id
+    })});
+    await api('rpc/snapshot_parametros_emitente',{method:'POST',body:JSON.stringify({p_proposta_id:nova[0].id,p_emitente_id:eid,p_usuario_id:currentUser.id})});
+    closeModal('modal-nova-proposta');toast('Proposta criada ✓','success');
+    await carregarPropostas();
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+function abrirProposta(){toast('Tela da proposta em desenvolvimento','warn');}
+
+// ══ CADASTROS — PESSOAS ══
+async function carregarPessoas(){
+  document.getElementById('tabela-pessoas').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr>';
+  try{
+    // Admin vê tudo. Não-admin: vê pessoas do(s) seu(s) emitente(s) e pool (null) se compartilha
+    let filtro='';
+    if(!currentUser.is_admin){
+      const ids=emitentesDoUsuario.map(e=>e.id);
+      const pool=emitentesDoUsuario.some(e=>e.compartilha_davila);
+      if(ids.length>0 && pool){
+        // emitentes próprios + pool compartilhado
+        filtro='&or=(emitente_id.in.('+ids.join(',')+'),emitente_id.is.null)';
+      }else if(ids.length>0){
+        // só emitentes próprios (sem pool)
+        filtro=ids.length===1?'&emitente_id=eq.'+ids[0]:'&emitente_id=in.('+ids.join(',')+')';
+      }else if(pool){
+        // só pool
+        filtro='&emitente_id=is.null';
+      }else{
+        // sem acesso a nada
+        todasPessoas=[];renderPessoas();return;
+      }
+    }
+    todasPessoas=await api('pessoas?select=id,tipo_pessoa,documento,razao_social,bairro,cidade,uf,logradouro,numero,complemento,cep,is_cliente,is_fornecedor,ativo,emitente_id&order=razao_social'+filtro)||[];
+    renderPessoas();
+  }catch(e){
+    document.getElementById('tabela-pessoas').innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+  }
+}
+function renderPessoas(){
+  const txt=document.getElementById('filtro-pessoa-texto').value.toLowerCase();
+  const tipo=document.getElementById('filtro-pessoa-tipo').value;
+  const ativo=document.getElementById('filtro-pessoa-ativo').value;
+  let lista=todasPessoas;
+  if(txt)lista=lista.filter(p=>p.razao_social.toLowerCase().includes(txt)||(p.documento||'').includes(txt));
+  if(tipo==='cliente')lista=lista.filter(p=>p.is_cliente&&!p.is_fornecedor);
+  else if(tipo==='fornecedor')lista=lista.filter(p=>p.is_fornecedor&&!p.is_cliente);
+  else if(tipo==='ambos')lista=lista.filter(p=>p.is_cliente&&p.is_fornecedor);
+  if(ativo!=='')lista=lista.filter(p=>String(p.ativo)===ativo);
+  const tbody=document.getElementById('tabela-pessoas');
+  if(!lista.length){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">Nenhum resultado</div><div class="empty-sub">Ajuste os filtros ou cadastre uma nova pessoa.</div></div></td></tr>';
+    return;
+  }
+  // Mostra coluna emitente apenas para admin
+  const thEmit=document.getElementById('th-emitente-pessoa');
+  if(thEmit) thEmit.style.display=currentUser.is_admin?'':'none';
+  tbody.innerHTML=lista.map(p=>{
+    const classe=(p.is_cliente&&p.is_fornecedor)?'<span class="class-tag class-cliente">Cliente</span><span class="class-tag class-fornecedor">Fornecedor</span>':p.is_cliente?'<span class="class-tag class-cliente">Cliente</span>':'<span class="class-tag class-fornecedor">Fornecedor</span>';
+    const sel=p.id===pessoaSelecionadaId?' row-selected':'';
+    // Resolve prefixo do emitente para admin
+    let tdEmit='';
+    if(currentUser.is_admin){
+      const emitObj=p.emitente_id?todosEmitentes.find(e=>e.id===p.emitente_id):null;
+      const sigla=emitObj?emitObj.prefixo:'AMB';
+      tdEmit=`<td style="font-size:11px;font-weight:700;color:var(--text2)">${sigla}</td>`;
+    }
+    return `<tr class="clickable${sel}" onclick="selecionarPessoa('${p.id}')">
+      <td><span class="tipo-${p.tipo_pessoa.toLowerCase()}">${p.tipo_pessoa}</span></td>
+      <td><div style="font-weight:700">${escHtml(p.razao_social)}</div>${p.nome_fantasia&&p.nome_fantasia!==p.razao_social?`<div style="font-size:11px;color:var(--text2)">${escHtml(p.nome_fantasia)}</div>`:''}</td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text2)">${p.tipo_pessoa==='PJ'?formatCNPJ(p.documento):formatCPF(p.documento)}</td>
+      ${tdEmit}
+      <td>${classe}</td>
+      <td>${p.ativo?'<span class="pill-ativo">Ativo</span>':'<span class="pill-inativo">Inativo</span>'}</td>
+      <td><div class="row-actions">
+        <button class="icon-btn btn-sm" onclick="event.stopPropagation();abrirModalPessoa('${p.id}')" title="Editar">✏️</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+async function selecionarPessoa(id){
+  pessoaSelecionadaId=id;
+  renderPessoas();
+  const painel=document.getElementById('painel-pessoa');
+  painel.classList.remove('hidden');
+  document.getElementById('painel-pessoa-body').innerHTML='<div class="loading" style="padding:20px"><div class="spinner"></div></div>';
+  try{
+    const res=await api(`pessoas?id=eq.${id}&select=*,pessoas_contatos(id,nome,cargo,email,telefone,ativo)`);
+    const p=res[0];
+    document.getElementById('painel-pessoa-nome').textContent=p.razao_social;
+    document.getElementById('painel-pessoa-doc').textContent=(p.tipo_pessoa==='PJ'?'CNPJ: '+formatCNPJ(p.documento):'CPF: '+formatCPF(p.documento));
+    const btnToggle=document.getElementById('btn-toggle-ativo-pessoa');
+    if(p.ativo){btnToggle.textContent='🚫 Inativar';btnToggle.className='btn btn-danger btn-sm';}
+    else{btnToggle.textContent='✅ Reativar';btnToggle.className='btn btn-success btn-sm';}
+    let html='<div class="panel-section">Dados Gerais</div>';
+    html+=panelField('Tipo',p.tipo_pessoa==='PJ'?'Pessoa Jurídica':'Pessoa Física');
+    html+=panelField('Classificação',(p.is_cliente&&p.is_fornecedor)?'Cliente e Fornecedor':p.is_cliente?'Cliente':'Fornecedor');
+    if(p.telefone)html+=panelField('Telefone',p.telefone);
+    if(p.nome_fantasia&&p.nome_fantasia!==p.razao_social)html+=panelField('Nome Fantasia',p.nome_fantasia);
+    const end=[p.logradouro,p.numero?'nº '+p.numero:'',p.complemento,p.bairro,p.cidade&&p.uf?p.cidade+' — '+p.uf:p.cidade||p.uf||''].filter(Boolean).join(', ');
+    if(end)html+=panelField('Endereço',end);
+    if(p.cep)html+=panelField('CEP',formatCEP(p.cep));
+    html+='<div class="panel-section">Contatos</div>';
+    const contatos=(p.pessoas_contatos||[]).filter(c=>c.ativo);
+    if(!contatos.length){
+      html+='<div style="color:var(--text3);font-size:12px;padding:4px 0">Nenhum contato. Use <strong>+ Contato</strong> abaixo.</div>';
+    }else{
+      contatos.forEach(c=>{
+        html+=`<div class="contato-item">
+          <div class="contato-nome">${escHtml(c.nome)}</div>
+          ${c.cargo?`<div class="contato-cargo">${escHtml(c.cargo)}</div>`:''}
+          ${c.email?`<div class="contato-email">✉️ ${escHtml(c.email)}</div>`:''}
+          ${c.telefone?`<div class="contato-tel">📞 ${escHtml(c.telefone)}</div>`:''}
+          <div class="contato-actions">
+            <button class="icon-btn" onclick="editarContato('${c.id}','${id}')" title="Editar">✏️</button>
+            <button class="icon-btn del" onclick="inativarContato('${c.id}','${id}')" title="Remover">🗑</button>
+          </div>
+        </div>`;
+      });
+    }
+    document.getElementById('painel-pessoa-body').innerHTML=html;
+  }catch(e){document.getElementById('painel-pessoa-body').innerHTML=`<div style="color:var(--red);padding:16px;font-size:12px">${escHtml(e.message)}</div>`;}
+}
+function panelField(label,value){return `<div class="panel-field"><div class="panel-label">${escHtml(label)}</div><div class="panel-value${value?'':' empty'}">${value?escHtml(String(value)):'—'}</div></div>`;}
+function fecharPainel(){pessoaSelecionadaId=null;document.getElementById('painel-pessoa').classList.add('hidden');renderPessoas();}
+function editarPessoaSelecionada(){if(!pessoaSelecionadaId){toast('Selecione uma pessoa primeiro','warn');return;}abrirModalPessoa(pessoaSelecionadaId);}
+async function toggleAtivoPessoa(){
+  if(!pessoaSelecionadaId)return;
+  const p=todasPessoas.find(x=>x.id===pessoaSelecionadaId);
+  if(!confirm(`Deseja ${p.ativo?'inativar':'reativar'} "${p.razao_social}"?`))return;
+  blockUI('Atualizando…');
+  try{
+    await api(`pessoas?id=eq.${pessoaSelecionadaId}`,{method:'PATCH',body:JSON.stringify({ativo:!p.ativo})});
+    toast(`Registro ${p.ativo?'inativado':'reativado'} ✓`,'success');
+    await carregarPessoas();fecharPainel();
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+function atualizarDocLabel(){
+  const tipo=document.getElementById('pe-tipo').value;
+  document.getElementById('pe-doc-label').textContent=tipo==='PJ'?'CNPJ (14 dígitos)':'CPF (11 dígitos)';
+  document.getElementById('pe-doc').placeholder=tipo==='PJ'?'00000000000000':'00000000000';
+  document.getElementById('pe-doc').maxLength=tipo==='PJ'?14:11;
+  document.getElementById('pe-nome-label').textContent=tipo==='PJ'?'Razão Social':'Nome Completo';
+}
+function abrirModalPessoa(id=null){
+  editandoPessoaId=id;
+  document.getElementById('modal-pessoa-title').textContent=id?'Editar Pessoa':'Nova Pessoa';
+  const campos=['pe-doc','pe-nome','pe-logradouro','pe-numero','pe-complemento','pe-bairro','pe-cidade','pe-uf','pe-cep'];
+  if(!id){
+    campos.forEach(f=>document.getElementById(f).value='');
+    document.getElementById('pe-telefone').value='';
+    document.getElementById('pe-nome-fantasia').value='';
+    document.getElementById('pe-tipo').value='PJ';
+    document.getElementById('pe-cliente').checked=true;
+    document.getElementById('pe-fornecedor').checked=false;
+    atualizarDocLabel();openModal('modal-pessoa');return;
+  }
+  const p=todasPessoas.find(x=>x.id===id);if(!p)return;
+  document.getElementById('pe-tipo').value=p.tipo_pessoa;
+  document.getElementById('pe-doc').value=p.documento;
+  document.getElementById('pe-nome').value=p.razao_social;
+  document.getElementById('pe-cliente').checked=p.is_cliente;
+  document.getElementById('pe-fornecedor').checked=p.is_fornecedor;
+  document.getElementById('pe-telefone').value=p.telefone||'';
+  document.getElementById('pe-nome-fantasia').value=p.nome_fantasia||'';
+  document.getElementById('pe-logradouro').value=p.logradouro||'';
+  document.getElementById('pe-numero').value=p.numero||'';
+  document.getElementById('pe-complemento').value=p.complemento||'';
+  document.getElementById('pe-bairro').value=p.bairro||'';
+  document.getElementById('pe-cidade').value=p.cidade||'';
+  document.getElementById('pe-uf').value=p.uf||'';
+  document.getElementById('pe-cep').value=p.cep||'';
+  atualizarDocLabel();openModal('modal-pessoa');
+}
+async function salvarPessoa(){
+  const tipo=document.getElementById('pe-tipo').value;
+  const doc=document.getElementById('pe-doc').value.trim().replace(/\D/g,'');
+  const nome=document.getElementById('pe-nome').value.trim();
+  const isCliente=document.getElementById('pe-cliente').checked;
+  const isFornecedor=document.getElementById('pe-fornecedor').checked;
+  if(!doc){toast('Informe o documento','error');return;}
+  if(!nome){toast('Informe o nome / razão social','error');return;}
+  if(!isCliente&&!isFornecedor){toast('Marque ao menos Cliente ou Fornecedor','error');return;}
+  // Define emitente_id conforme regra de compartilhamento:
+  // - emitente com compartilha_davila=true → null (pool global)
+  // - emitente sem compartilhamento → UUID do emitente do usuário
+  // - admin sem emitente associado → null
+  let emitenteIdPessoa = null;
+  if(!currentUser.is_admin && emitentesDoUsuario.length > 0){
+    const naoCompartilha = emitentesDoUsuario.find(e => !e.compartilha_davila);
+    if(naoCompartilha) emitenteIdPessoa = naoCompartilha.id;
+    // se todos compartilham, fica null (pool)
+  }
+  const payload={tipo_pessoa:tipo,documento:doc,razao_social:nome,is_cliente:isCliente,is_fornecedor:isFornecedor,
+    emitente_id:emitenteIdPessoa,
+    logradouro:document.getElementById('pe-logradouro').value.trim()||null,
+    numero:document.getElementById('pe-numero').value.trim()||null,
+    complemento:document.getElementById('pe-complemento').value.trim()||null,
+    bairro:document.getElementById('pe-bairro').value.trim()||null,
+    cidade:document.getElementById('pe-cidade').value.trim()||null,
+    uf:document.getElementById('pe-uf').value.trim().toUpperCase()||null,
+    cep:document.getElementById('pe-cep').value.trim().replace(/\D/g,'')||null,
+    telefone:document.getElementById('pe-telefone').value.trim()||null,
+    nome_fantasia:document.getElementById('pe-nome-fantasia').value.trim()||null};
+  blockUI('Salvando…');
+  try{
+    if(editandoPessoaId){
+      // Na edição não altera emitente_id — preserva o valor original do registro
+      const {emitente_id:_,...payloadEdicao}=payload;
+      await api(`pessoas?id=eq.${editandoPessoaId}`,{method:'PATCH',body:JSON.stringify(payloadEdicao)});
+      toast('Registro atualizado ✓','success');
+    }else{
+      await api('pessoas',{method:'POST',body:JSON.stringify({...payload,criado_por:currentUser.id})});
+      toast('Registro criado ✓','success');
+    }
+    closeModal('modal-pessoa');
+    await carregarPessoas();
+    if(editandoPessoaId)selecionarPessoa(editandoPessoaId);
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+
+// ── Contatos ──
+function abrirModalContato(){
+  if(!pessoaSelecionadaId){toast('Selecione uma pessoa primeiro','warn');return;}
+  editandoContatoId=null;
+  document.getElementById('modal-contato-title').textContent='Novo Contato';
+  ['co-nome','co-cargo','co-email','co-telefone'].forEach(f=>document.getElementById(f).value='');
+  openModal('modal-contato');
+}
+async function editarContato(cid,pid){
+  pessoaSelecionadaId=pid;editandoContatoId=cid;
+  try{
+    const res=await api(`pessoas_contatos?id=eq.${cid}&select=*`);
+    const c=res[0];
+    document.getElementById('modal-contato-title').textContent='Editar Contato';
+    document.getElementById('co-nome').value=c.nome||'';
+    document.getElementById('co-cargo').value=c.cargo||'';
+    document.getElementById('co-email').value=c.email||'';
+    document.getElementById('co-telefone').value=c.telefone||'';
+    openModal('modal-contato');
+  }catch(e){toast('Erro: '+e.message,'error');}
+}
+async function salvarContato(){
+  const nome=document.getElementById('co-nome').value.trim();
+  if(!nome){toast('Informe o nome do contato','error');return;}
+  const payload={nome,cargo:document.getElementById('co-cargo').value.trim()||null,email:document.getElementById('co-email').value.trim()||null,telefone:document.getElementById('co-telefone').value.trim()||null};
+  blockUI('Salvando contato…');
+  try{
+    if(editandoContatoId){
+      await api(`pessoas_contatos?id=eq.${editandoContatoId}`,{method:'PATCH',body:JSON.stringify(payload)});
+      toast('Contato atualizado ✓','success');
+    }else{
+      await api('pessoas_contatos',{method:'POST',body:JSON.stringify({...payload,pessoa_id:pessoaSelecionadaId,criado_por:currentUser.id})});
+      toast('Contato adicionado ✓','success');
+    }
+    closeModal('modal-contato');await selecionarPessoa(pessoaSelecionadaId);
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+async function inativarContato(cid,pid){
+  if(!confirm('Remover este contato?'))return;
+  blockUI('Removendo…');
+  try{
+    await api(`pessoas_contatos?id=eq.${cid}`,{method:'PATCH',prefer:'return=minimal',body:JSON.stringify({ativo:false})});
+    toast('Contato removido','success');await selecionarPessoa(pid);
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+
+// ══ ADMINISTRAÇÃO ══
+function switchAdminTab(tab){
+  currentAdminTab=tab;
+  ['usuarios','emitentes','numeracao'].forEach(t=>{
+    document.getElementById('admtab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('admin-'+t).style.display=t===tab?'block':'none';
+  });
+  const subtitulos={usuarios:'Usuários',emitentes:'Emitentes',numeracao:'Numeração de Propostas'};
+  document.getElementById('admin-subtitulo').textContent=subtitulos[tab];
+  const btnTextos={usuarios:'+ Novo Usuário',emitentes:'+ Novo Emitente',numeracao:'+ Configurar Grupo'};
+  document.getElementById('btn-novo-admin').textContent=btnTextos[tab];
+  document.getElementById('btn-novo-admin').onclick=
+    tab==='usuarios'?abrirModalNovoUsuario:
+    tab==='numeracao'?()=>abrirModalNumeracao():
+    ()=>abrirModalNovoEmitente();
+  if(tab==='usuarios')carregarUsuariosAdmin();
+  else if(tab==='emitentes')carregarEmitentesAdmin();
+  else carregarNumeracaoAdmin();
+}
+function abrirModalNovoAdmin(){
+  if(currentAdminTab==='usuarios')abrirModalNovoUsuario();
+  else if(currentAdminTab==='numeracao')abrirModalNumeracao();
+  else abrirModalNovoEmitente();
+}
+
+// ── Numeração ──
+let editandoNumeracaoGrupoId=null;
+
+async function carregarNumeracaoAdmin(){
+  document.getElementById('admin-numeracao-body').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  try{
+    const anoAtual=new Date().getFullYear();
+    const grupos=await api('grupos_numeracao?select=id,nome,prefixo')||[];
+    const emitentes=await api('emitentes?select=id,nome_fantasia,prefixo,grupo_numeracao_id')||[];
+    const configs=await api('contadores_numeracao_config?select=*')||[];
+    const contadores=await api('contadores_numeracao?select=*')||[];
+    const props=await api(`propostas?select=id,emitente_id,ano&ano=eq.${anoAtual}`)||[];
+
+    // Guarda dados para acesso via índice — evita problema de apóstrofos no onclick
+    window._gruposNumeracao=grupos.map(g=>{
+      const emitsDoGrupo=emitentes.filter(e=>e.grupo_numeracao_id===g.id);
+      const emitIds=emitsDoGrupo.map(e=>e.id);
+      const cfg=configs.find(c=>c.grupo_id===g.id&&c.ano===anoAtual);
+      const cnt=contadores.find(c=>c.grupo_id===g.id&&c.ano===anoAtual);
+      const numInicial=cfg?cfg.numero_inicial:0;
+      const ultimoContador=cnt?cnt.ultimo_numero:0;
+      const propsGrupo=props.filter(p=>emitIds.includes(p.emitente_id));
+      return {
+        id:g.id,nome:g.nome,prefixo:g.prefixo,
+        emitNomes:emitsDoGrupo.map(e=>e.nome_fantasia||e.prefixo).join(', ')||'—',
+        numInicial,ultimoContador,
+        temPropostas:propsGrupo.length>0,qtdPropostas:propsGrupo.length
+      };
+    });
+
+    const tbody=document.getElementById('admin-numeracao-body');
+    let html='';
+    window._gruposNumeracao.forEach((g,idx)=>{
+      const proxNum=g.ultimoContador>0?g.ultimoContador+1:g.numInicial+1;
+      const proxFormatado=`${g.prefixo}-ORC-${String(anoAtual).slice(-2)}${String(proxNum).padStart(3,'0')}`;
+      html+=`<tr>
+        <td style="font-weight:700">${escHtml(g.nome)}</td>
+        <td style="font-size:12px;color:var(--text2)">${escHtml(g.emitNomes)}</td>
+        <td style="font-family:monospace;font-weight:700">${anoAtual}</td>
+        <td style="font-family:monospace;font-size:14px;font-weight:800;color:var(--azul)">${g.numInicial||'—'}</td>
+        <td><span class="prop-num">${proxFormatado}</span></td>
+        <td style="text-align:center">${g.temPropostas?`<span class="pill-ativo">${g.qtdPropostas}</span>`:'<span style="color:var(--text3);font-size:12px">Nenhuma</span>'}</td>
+        <td><div class="row-actions">
+          <button class="icon-btn btn-sm" onclick="abrirModalNumeracaoIdx(${idx},${anoAtual})" title="${g.temPropostas?'Contador já iniciado — cuidado ao alterar':'Configurar número inicial'}">
+            ${g.temPropostas?'⚠️':'✏️'}
+          </button>
+        </div></td>
+      </tr>`;
+    });
+    tbody.innerHTML=html||'<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🔢</div><div class="empty-title">Nenhum grupo</div></div></td></tr>';
+  }catch(e){
+    document.getElementById('admin-numeracao-body').innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+  }
+}
+
+function abrirModalNumeracaoIdx(idx,ano){
+  const g=(window._gruposNumeracao||[])[idx];
+  if(!g)return;
+  abrirModalNumeracao(g.id,g.nome,g.prefixo,g.numInicial,ano,g.temPropostas);
+}
+
+function abrirModalNumeracao(grupoId=null,grupoNome='',prefixo='',numInicial=0,ano=new Date().getFullYear(),temPropostas=false){
+  editandoNumeracaoGrupoId=grupoId;
+  document.getElementById('modal-numeracao-title').textContent=grupoId?`Configurar — ${grupoNome}`:'Configurar Numeração';
+  document.getElementById('num-grupo').value=grupoNome;
+  document.getElementById('num-ano').value=ano;
+  document.getElementById('num-inicial').value=numInicial||'';
+  document.getElementById('num-obs').value='';
+  atualizarPreviewNumeracao(prefixo,ano,numInicial);
+  document.getElementById('num-inicial').oninput=()=>{
+    atualizarPreviewNumeracao(prefixo,parseInt(document.getElementById('num-ano').value)||ano,parseInt(document.getElementById('num-inicial').value)||0);
+  };
+  document.getElementById('num-ano').oninput=()=>{
+    atualizarPreviewNumeracao(prefixo,parseInt(document.getElementById('num-ano').value)||ano,parseInt(document.getElementById('num-inicial').value)||0);
+  };
+  if(temPropostas){
+    document.getElementById('num-preview').style.background='#fff8e1';
+    document.getElementById('num-preview').style.borderColor='#f5c842';
+    document.getElementById('num-preview').innerHTML='⚠️ <strong>Atenção:</strong> este grupo já possui propostas no Orca para este ano. Alterar o número inicial pode gerar conflitos de numeração. Prossiga somente se souber o que está fazendo.<br><br>Próxima proposta: <strong id="num-preview-text">—</strong>';
+  } else {
+    document.getElementById('num-preview').style.background='';
+    document.getElementById('num-preview').style.borderColor='';
+    document.getElementById('num-preview').innerHTML='A próxima proposta será: <strong id="num-preview-text">—</strong>';
+  }
+  atualizarPreviewNumeracao(prefixo,ano,numInicial);
+  openModal('modal-numeracao');
+}
+
+function atualizarPreviewNumeracao(prefixo,ano,numInicial){
+  const prox=numInicial+1;
+  const txt=document.getElementById('num-preview-text');
+  if(txt)txt.textContent=`${prefixo}-ORC-${String(ano).slice(-2)}${String(prox).padStart(3,'0')}`;
+}
+
+async function salvarNumeracao(){
+  if(!editandoNumeracaoGrupoId){toast('Selecione um grupo','error');return;}
+  const ano=parseInt(document.getElementById('num-ano').value);
+  const numInicial=parseInt(document.getElementById('num-inicial').value)||0;
+  const obs=document.getElementById('num-obs').value.trim()||null;
+  if(!ano||ano<2020||ano>2099){toast('Ano inválido','error');return;}
+  if(numInicial<0||numInicial>998){toast('Número deve estar entre 0 e 998','error');return;}
+  blockUI('Salvando configuração…');
+  try{
+    // Verifica se já existe config para este grupo/ano e faz insert ou update
+    const existingCfg=await api(`contadores_numeracao_config?grupo_id=eq.${editandoNumeracaoGrupoId}&ano=eq.${ano}&select=id`);
+    if(existingCfg&&existingCfg.length){
+      await api(`contadores_numeracao_config?id=eq.${existingCfg[0].id}`,{
+        method:'PATCH',prefer:'return=minimal',
+        body:JSON.stringify({numero_inicial:numInicial,observacao:obs})
+      });
+    }else{
+      await api('contadores_numeracao_config',{
+        method:'POST',prefer:'return=minimal',
+        body:JSON.stringify({grupo_id:editandoNumeracaoGrupoId,ano,numero_inicial:numInicial,observacao:obs,criado_por:currentUser.id})
+      });
+    }
+
+    // Atualiza o contador ativo se não passou do inicial ainda
+    const cnt=await api(`contadores_numeracao?grupo_id=eq.${editandoNumeracaoGrupoId}&ano=eq.${ano}&select=id,ultimo_numero`);
+    if(cnt&&cnt.length){
+      if(cnt[0].ultimo_numero<=numInicial){
+        await api(`contadores_numeracao?id=eq.${cnt[0].id}`,{
+          method:'PATCH',
+          prefer:'return=minimal',
+          body:JSON.stringify({ultimo_numero:numInicial})
+        });
+      }
+    }
+    toast('Configuração salva ✓','success');
+    closeModal('modal-numeracao');
+    await carregarNumeracaoAdmin();
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+
+// ── Usuários ──
+async function carregarUsuariosAdmin(){
+  document.getElementById('admin-usuarios-body').innerHTML='<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  try{
+    const us=await api('usuarios?select=id,nome,sigla,email,is_admin,pode_criar_proposta,ativo,usuarios_emitentes!usuarios_emitentes_usuario_id_fkey(emitente_id,emitentes(nome_fantasia,prefixo))&order=nome')||[];
+    const tbody=document.getElementById('admin-usuarios-body');
+    if(!us.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Nenhum usuário</div></div></td></tr>';return;}
+    tbody.innerHTML=us.map(u=>{
+      const emits=(u.usuarios_emitentes||[]).map(ue=>`<span class="emit-tag" style="margin:1px">${escHtml(ue.emitentes?.nome_fantasia||ue.emitentes?.prefixo||'?')}</span>`).join(' ')||'<span style="color:var(--text3);font-size:12px">—</span>';
+      const isMe=u.id===currentUser.id;
+      return `<tr>
+        <td><span class="pill-sigla">${escHtml(u.sigla.trim())}</span></td>
+        <td style="font-weight:700">${escHtml(u.nome)}${isMe?' <span style="font-size:10px;color:var(--azul);font-weight:800">(você)</span>':''}</td>
+        <td style="font-size:12px;color:var(--text2)">${escHtml(u.email)}</td>
+        <td>${u.is_admin?'<span class="pill-admin">Admin</span> ':''}<span style="font-size:11px;color:var(--text2)">${u.pode_criar_proposta?'Criador':''}</span></td>
+        <td>${emits}</td>
+        <td>${u.ativo?'<span class="pill-ativo">Ativo</span>':'<span class="pill-inativo">Inativo</span>'}</td>
+        <td><div class="row-actions">
+          <button class="icon-btn btn-sm" onclick="abrirModalEditarUsuario('${u.id}')">✏️</button>
+          ${!isMe?`<button class="icon-btn btn-sm del" onclick="toggleAtivoUsuario('${u.id}',${u.ativo},'${escHtml(u.nome)}')">${u.ativo?'🚫':'✅'}</button>`:''}
+        </div></td>
+      </tr>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('admin-usuarios-body').innerHTML=`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+  }
+}
+async function abrirModalNovoUsuario(){
+  editandoUsuarioId=null;
+  document.getElementById('modal-usuario-title').textContent='Novo Usuário';
+  ['u-uuid','u-nome','u-sigla','u-email'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('u-uuid').disabled=false;
+  document.getElementById('u-admin').checked=false;
+  document.getElementById('u-criador').checked=true;
+  await carregarEmitentesModalUsuario([]);
+  openModal('modal-usuario');
+}
+async function abrirModalEditarUsuario(id){
+  editandoUsuarioId=id;
+  document.getElementById('modal-usuario-title').textContent='Editar Usuário';
+  try{
+    const res=await api(`usuarios?id=eq.${id}&select=id,nome,sigla,email,is_admin,pode_criar_proposta,usuarios_emitentes!usuarios_emitentes_usuario_id_fkey(emitente_id)`);
+    const u=res[0];
+    document.getElementById('u-uuid').value=u.id;document.getElementById('u-uuid').disabled=true;
+    document.getElementById('u-nome').value=u.nome;
+    document.getElementById('u-sigla').value=u.sigla.trim();
+    document.getElementById('u-email').value=u.email;
+    document.getElementById('u-admin').checked=u.is_admin;
+    document.getElementById('u-criador').checked=u.pode_criar_proposta;
+    await carregarEmitentesModalUsuario((u.usuarios_emitentes||[]).map(ue=>ue.emitente_id));
+    openModal('modal-usuario');
+  }catch(e){toast('Erro: '+e.message,'error');}
+}
+async function carregarEmitentesModalUsuario(selecionados){
+  const lista=document.getElementById('u-emitentes-list');
+  lista.innerHTML=todosEmitentes.map(e=>`<label class="emit-check-item"><input type="checkbox" name="u-emit" value="${e.id}" ${selecionados.includes(e.id)?'checked':''}>${escHtml(e.nome_fantasia||e.prefixo)}</label>`).join('')||'<span style="color:var(--text3);font-size:12px">Nenhum emitente</span>';
+}
+async function salvarUsuario(){
+  const uuid=document.getElementById('u-uuid').value.trim();
+  const nome=document.getElementById('u-nome').value.trim();
+  const sigla=document.getElementById('u-sigla').value.trim().toUpperCase();
+  const email=document.getElementById('u-email').value.trim().toLowerCase();
+  const isAdm=document.getElementById('u-admin').checked;
+  const isCri=document.getElementById('u-criador').checked;
+  if(!nome){toast('Informe o nome','error');return;}
+  if(sigla.length!==3){toast('A sigla deve ter 3 caracteres','error');return;}
+  if(!email){toast('Informe o e-mail','error');return;}
+  const emitsSel=[...document.querySelectorAll('input[name="u-emit"]:checked')].map(i=>i.value);
+  blockUI('Salvando usuário…');
+  try{
+    if(!editandoUsuarioId){
+      if(!uuid.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i))throw new Error('UUID inválido.');
+      await api('usuarios',{method:'POST',body:JSON.stringify({id:uuid,nome,sigla,email,is_admin:isAdm,pode_criar_proposta:isCri,criado_por:currentUser.id})});
+      if(emitsSel.length)await api('usuarios_emitentes',{method:'POST',body:JSON.stringify(emitsSel.map(eid=>({usuario_id:uuid,emitente_id:eid,criado_por:currentUser.id})))});
+    }else{
+      await api(`usuarios?id=eq.${editandoUsuarioId}`,{method:'PATCH',body:JSON.stringify({nome,sigla,email,is_admin:isAdm,pode_criar_proposta:isCri})});
+      await api(`usuarios_emitentes?usuario_id=eq.${editandoUsuarioId}`,{method:'DELETE',prefer:'return=minimal'});
+      if(emitsSel.length)await api('usuarios_emitentes',{method:'POST',body:JSON.stringify(emitsSel.map(eid=>({usuario_id:editandoUsuarioId,emitente_id:eid,criado_por:currentUser.id})))});
+    }
+    toast('Usuário salvo ✓','success');closeModal('modal-usuario');await carregarUsuariosAdmin();
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+async function toggleAtivoUsuario(id,ativo,nome){
+  if(!confirm(`Deseja ${ativo?'inativar':'reativar'} "${nome}"?`))return;
+  blockUI('Atualizando…');
+  try{
+    await api(`usuarios?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({ativo:!ativo})});
+    toast(`Usuário ${ativo?'inativado':'reativado'} ✓`,'success');await carregarUsuariosAdmin();
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+
+// ── Emitentes admin ──
+async function carregarEmitentesBase(){
+  try{todosEmitentes=await api('emitentes?ativo=eq.true&select=id,nome_fantasia,prefixo&order=nome_fantasia')||[];}catch(e){}
+}
+async function carregarEmitentesAdmin(){
+  document.getElementById('admin-emitentes-body').innerHTML='<tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  try{
+    const em=await api('emitentes?select=id,cnpj,razao_social,nome_fantasia,prefixo,regime_tributario,compartilha_davila,compartilha_travado,ativo,logo,grupos_numeracao(nome)&order=nome_fantasia')||[];
+    const tbody=document.getElementById('admin-emitentes-body');
+    if(!em.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🏛️</div><div class="empty-title">Nenhum emitente</div></div></td></tr>';return;}
+    tbody.innerHTML=em.map(e=>{
+      const logoHtml=e.logo
+        ?`<img src="${e.logo}" class="logo-preview" alt="logo">`
+        :`<div class="logo-preview-empty">🏛️</div>`;
+      return `<tr>
+        <td>${logoHtml}</td>
+        <td><span class="prop-num">${escHtml(e.prefixo)}</span></td>
+        <td style="font-weight:700">${escHtml(e.nome_fantasia||e.razao_social)}</td>
+        <td style="font-family:monospace;font-size:12px;color:var(--text2)">${formatCNPJ(e.cnpj)}</td>
+        <td><span class="pill-regime">${escHtml(e.regime_tributario)}</span></td>
+        <td>${e.compartilha_davila?'<span class="pill-ativo">Sim</span>':'<span class="pill-inativo">Não</span>'}${e.compartilha_travado?' <span style="font-size:10px;color:var(--text3)">🔒</span>':''}</td>
+        <td>${e.ativo?'<span class="pill-ativo">Ativo</span>':'<span class="pill-inativo">Inativo</span>'}</td>
+        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalEditarEmitente('${e.id}')">✏️</button></div></td>
+      </tr>`;
+    }).join('');
+  }catch(e){
+    document.getElementById('admin-emitentes-body').innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+  }
+}
+function abrirModalNovoEmitente(){
+  editandoEmitenteId=null;emLogoBase64=null;emLogoRemovido=false;
+  document.getElementById('modal-emitente-title').textContent='Novo Emitente';
+  // Limpa todos os campos
+  ['em-cnpj','em-razao','em-fantasia','em-logradouro','em-numero','em-complemento','em-bairro','em-cidade','em-uf','em-cep'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('em-prefixo').value='';
+  document.getElementById('em-prefixo').disabled=false;
+  document.getElementById('em-prefixo-obrig').style.display='inline';
+  document.getElementById('em-prefixo-hint').style.display='block';
+  document.getElementById('em-regime').value='Simples Nacional';
+  document.getElementById('em-ativo').checked=true;
+  document.getElementById('em-logo-file').value='';
+  document.getElementById('em-logo-preview-wrap').innerHTML='<div class="logo-preview-empty">🏛️</div>';
+  document.getElementById('btn-remover-logo').style.display='none';
+  // Compartilhamento — habilitado e com aviso
+  const chk=document.getElementById('em-compartilha');
+  chk.checked=false;chk.disabled=false;
+  document.getElementById('em-compartilha-aviso').style.display='block';
+  document.getElementById('em-compartilha-travado').style.display='none';
+  chk.onchange=()=>{document.getElementById('em-compartilha-aviso').style.display=chk.checked?'none':'block';};
+  openModal('modal-emitente');
+}
+
+async function abrirModalEditarEmitente(id){
+  editandoEmitenteId=id;emLogoBase64=null;emLogoRemovido=false;
+  try{
+    const res=await api(`emitentes?id=eq.${id}&select=*`);
+    const e=res[0];
+    document.getElementById('modal-emitente-title').textContent=`Editar — ${e.nome_fantasia||e.prefixo}`;
+    document.getElementById('em-cnpj').value=e.cnpj||'';
+    document.getElementById('em-prefixo').value=e.prefixo||'';
+    document.getElementById('em-prefixo').disabled=true;
+    document.getElementById('em-prefixo-obrig').style.display='none';
+    document.getElementById('em-prefixo-hint').style.display='none';
+    document.getElementById('em-razao').value=e.razao_social||'';
+    document.getElementById('em-fantasia').value=e.nome_fantasia||'';
+    document.getElementById('em-regime').value=e.regime_tributario||'Simples Nacional';
+    document.getElementById('em-cidade').value=e.cidade||'';
+    document.getElementById('em-uf').value=e.uf||'';
+    document.getElementById('em-logradouro').value=e.logradouro||'';
+    document.getElementById('em-numero').value=e.numero||'';
+    document.getElementById('em-complemento').value=e.complemento||'';
+    document.getElementById('em-bairro').value=e.bairro||'';
+    document.getElementById('em-cep').value=e.cep||'';
+    document.getElementById('em-ativo').checked=e.ativo;
+    document.getElementById('em-logo-file').value='';
+    // Logo preview
+    const wrap=document.getElementById('em-logo-preview-wrap');
+    wrap.innerHTML=e.logo?`<img src="${e.logo}" class="logo-preview" alt="logo">`:`<div class="logo-preview-empty">🏛️</div>`;
+    document.getElementById('btn-remover-logo').style.display=e.logo?'inline-flex':'none';
+    // Compartilhamento
+    const chk=document.getElementById('em-compartilha');
+    const aviso=document.getElementById('em-compartilha-aviso');
+    const travado=document.getElementById('em-compartilha-travado');
+    chk.checked=e.compartilha_davila;
+    if(e.compartilha_travado){
+      chk.disabled=true;aviso.style.display='none';travado.style.display='block';
+    }else{
+      chk.disabled=false;travado.style.display='none';
+      aviso.style.display=e.compartilha_davila?'none':'block';
+      chk.onchange=()=>{aviso.style.display=chk.checked?'none':'block';};
+    }
+    openModal('modal-emitente');
+  }catch(e){toast('Erro: '+e.message,'error');}
+}
+function previewLogo(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>300*1024){toast('Imagem muito grande. Máximo 300KB.','error');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    emLogoBase64=ev.target.result;
+    emLogoRemovido=false;
+    document.getElementById('em-logo-preview-wrap').innerHTML=`<img src="${emLogoBase64}" class="logo-preview" alt="logo">`;
+    document.getElementById('btn-remover-logo').style.display='inline-flex';
+  };
+  reader.readAsDataURL(file);
+}
+function removerLogo(){
+  emLogoBase64=null;emLogoRemovido=true;
+  document.getElementById('em-logo-preview-wrap').innerHTML='<div class="logo-preview-empty">🏛️</div>';
+  document.getElementById('em-logo-file').value='';
+  document.getElementById('btn-remover-logo').style.display='none';
+}
+async function salvarEmitente(){
+  const cnpj=document.getElementById('em-cnpj').value.trim().replace(/\D/g,'');
+  const razao=document.getElementById('em-razao').value.trim();
+  const prefixo=document.getElementById('em-prefixo').value.trim().toUpperCase();
+  const compartilha=document.getElementById('em-compartilha').checked;
+  if(!cnpj||cnpj.length!==14){toast('CNPJ deve ter 14 dígitos','error');return;}
+  if(!razao){toast('Informe a Razão Social','error');return;}
+  if(!editandoEmitenteId&&prefixo.length!==3){toast('O prefixo deve ter exatamente 3 letras','error');return;}
+  const payload={
+    cnpj,razao_social:razao,
+    nome_fantasia:document.getElementById('em-fantasia').value.trim()||null,
+    regime_tributario:document.getElementById('em-regime').value,
+    cidade:document.getElementById('em-cidade').value.trim()||null,
+    uf:document.getElementById('em-uf').value.trim().toUpperCase()||null,
+    logradouro:document.getElementById('em-logradouro').value.trim()||null,
+    numero:document.getElementById('em-numero').value.trim()||null,
+    complemento:document.getElementById('em-complemento').value.trim()||null,
+    bairro:document.getElementById('em-bairro').value.trim()||null,
+    cep:document.getElementById('em-cep').value.trim().replace(/\D/g,'')||null,
+    ativo:document.getElementById('em-ativo').checked,
+    compartilha_davila:compartilha,
+  };
+  if(emLogoBase64)payload.logo=emLogoBase64;
+  else if(emLogoRemovido)payload.logo=null;
+  blockUI('Salvando emitente…');
+  try{
+    if(editandoEmitenteId){
+      // EDIÇÃO
+      await api(`emitentes?id=eq.${editandoEmitenteId}`,{method:'PATCH',body:JSON.stringify(payload)});
+      toast('Emitente atualizado ✓','success');
+    }else{
+      // CRIAÇÃO — define grupo de numeração
+      let grupoId;
+      if(compartilha){
+        // Entra no grupo AMB
+        const grpAmb=await api('grupos_numeracao?prefixo=eq.AMB&select=id');
+        if(!grpAmb?.length)throw new Error('Grupo AMB não encontrado.');
+        grupoId=grpAmb[0].id;
+      }else{
+        // Cria novo grupo com o prefixo do emitente
+        const novoGrupo=await api('grupos_numeracao',{method:'POST',body:JSON.stringify({
+          nome:`Grupo ${prefixo} — ${document.getElementById('em-fantasia').value.trim()||razao}`,
+          prefixo,
+          criado_por:currentUser.id
+        })});
+        grupoId=novoGrupo[0].id;
+      }
+      payload.prefixo=prefixo;
+      payload.grupo_numeracao_id=grupoId;
+      payload.compartilha_travado=false;
+      payload.criado_por=currentUser.id;
+      await api('emitentes',{method:'POST',body:JSON.stringify(payload)});
+      toast('Emitente criado ✓','success');
+    }
+    closeModal('modal-emitente');
+    await carregarEmitentesAdmin();await carregarEmitentesBase();
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
+
+// ── HELPERS ──
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function blockUI(msg='Processando…'){document.getElementById('block-msg').textContent=msg;document.getElementById('block-overlay').classList.add('active');}
+function unblockUI(){document.getElementById('block-overlay').classList.remove('active');}
+function toast(msg,type=''){const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=msg;document.getElementById('toasts').appendChild(el);setTimeout(()=>el.remove(),3500);}
+function escHtml(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function formatCNPJ(v){if(!v||v.length!==14)return v||'—';return v.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,'$1.$2.$3/$4-$5');}
+function formatCPF(v){if(!v||v.length!==11)return v||'—';return v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
+function formatCEP(v){if(!v||v.length!==8)return v||'—';return v.replace(/(\d{5})(\d{3})/,'$1-$2');}
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
+</script>
+</body>
+</html>
