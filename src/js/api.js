@@ -3,15 +3,16 @@ import { state } from './state.js';
 import { logout, showLoginError } from './auth.js';
 
 export const api = async (path, opts = {}) => {
+  const { headers: extraHeaders, prefer, ...restOpts } = opts;
   const r = await fetch(`${SUPA_URL}/rest/v1/${path}`, {
     headers: {
       'apikey': SUPA_KEY,
       'Authorization': `Bearer ${state.sessionToken || SUPA_KEY}`,
       'Content-Type': 'application/json',
-      'Prefer': opts.prefer || 'return=representation',
-      ...opts.headers,
+      'Prefer': prefer || 'return=representation',
+      ...extraHeaders,
     },
-    ...opts,
+    ...restOpts,
   });
   if (!r.ok) {
     const t = await r.text();

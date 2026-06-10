@@ -150,7 +150,7 @@ function _renderParametros(params, emitId) {
           <td style="font-family:monospace;font-weight:700;font-size:12px">${escHtml(p.codigo)}</td>
           <td>${escHtml(desc)}</td>
           <td style="text-align:right;font-weight:700">${parseFloat(p.percentual).toFixed(4).replace('.',',')}%</td>
-          <td><button class="icon-btn btn-sm" onclick="abrirModalEditarParam('${p.emitente_id}','${p.tipo}','${escHtml(p.codigo)}','${escHtml(desc)}',${p.percentual},${JSON.stringify(p.alterado_em)})" title="Editar">✏️</button></td>
+          <td><button class="icon-btn btn-sm" onclick="abrirModalEditarParam('${p.emitente_id}','${p.tipo}','${escHtml(p.codigo)}','${escHtml(desc)}',${p.percentual},'${p.alterado_em}')" title="Editar">✏️</button></td>
         </tr>`;
       });
     }
@@ -304,7 +304,6 @@ export async function salvarFuncao() {
     } else {
       const res = await api('funcoes', {
         method: 'POST',
-        headers: { 'Prefer': 'return=representation' },
         body: JSON.stringify({ nome, requer_pessoa, valor_hora_padrao, ativo, emitente_id, criado_por: state.currentUser.id }),
       });
       funcao_id = res[0].id;
@@ -316,7 +315,7 @@ export async function salvarFuncao() {
       const valor_mensal = raw ? parseFloat(raw) : 0;
       await api('funcoes_encargos_complementares', {
         method: 'POST',
-        headers: { 'Prefer': 'resolution=merge-duplicates' },
+        prefer: 'resolution=merge-duplicates',
         body: JSON.stringify({ funcao_id, categoria: c.key, valor_mensal, horas_mensais: 220 }),
       });
     }
@@ -584,7 +583,6 @@ export async function salvarItemTabela() {
     } else {
       const res = await api('tabela_precos', {
         method: 'POST',
-        headers: { 'Prefer': 'return=representation' },
         body: JSON.stringify({ descricao, unidade, categoria, tp, ativo, emitente_id, criado_por: state.currentUser.id }),
       });
       item_id = res[0].id;
@@ -692,7 +690,6 @@ export async function salvarServico() {
     } else {
       const res = await api('servicos_terceiros', {
         method: 'POST',
-        headers: { 'Prefer': 'return=representation' },
         body: JSON.stringify({ descricao, unidade, ativo, emitente_id, criado_por: state.currentUser.id }),
       });
       servico_id = res[0].id;
