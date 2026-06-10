@@ -150,7 +150,7 @@ function _renderParametros(params, emitId) {
           <td style="font-family:monospace;font-weight:700;font-size:12px">${escHtml(p.codigo)}</td>
           <td>${escHtml(desc)}</td>
           <td style="text-align:right;font-weight:700">${parseFloat(p.percentual).toFixed(4).replace('.',',')}%</td>
-          <td><button class="icon-btn btn-sm" onclick="abrirModalEditarParam('${p.emitente_id}','${p.tipo}','${escHtml(p.codigo)}','${escHtml(desc)}',${p.percentual},'${p.alterado_em}')" title="Editar">✏️</button></td>
+          <td><button class="icon-btn btn-sm" onclick="abrirModalEditarParam('${p.emitente_id}','${p.tipo}','${escHtml(p.codigo)}','${escHtml(desc)}',${p.percentual})" title="Editar">✏️</button></td>
         </tr>`;
       });
     }
@@ -159,8 +159,8 @@ function _renderParametros(params, emitId) {
   document.getElementById('cap-params-body').innerHTML = html;
 }
 
-export function abrirModalEditarParam(emitente_id, tipo, codigo, descricao, percentual, alterado_em) {
-  _paramEditando = { emitente_id, tipo, codigo, descricao, percentual, alterado_em, isNew: false };
+export function abrirModalEditarParam(emitente_id, tipo, codigo, descricao, percentual) {
+  _paramEditando = { emitente_id, tipo, codigo, descricao, percentual, isNew: false };
   document.getElementById('modal-param-title').textContent = `Editar — ${codigo}`;
   document.getElementById('param-codigo').value = codigo;
   document.getElementById('param-codigo').disabled = true;
@@ -196,9 +196,7 @@ export async function salvarParam() {
   blockUI('Salvando parâmetro…');
   try {
     if (!_paramEditando.isNew) {
-      // Close the current record
-      const enc = encodeURIComponent(_paramEditando.alterado_em);
-      await api(`emitentes_parametros_historico?emitente_id=eq.${emitente_id}&tipo=eq.${tipo}&codigo=eq.${codigo}&alterado_em=eq.${enc}`, {
+      await api(`emitentes_parametros_historico?emitente_id=eq.${emitente_id}&tipo=eq.${tipo}&codigo=eq.${codigo}&vigente_ate=is.null`, {
         method: 'PATCH',
         body: JSON.stringify({ vigente_ate: new Date().toISOString() }),
       });
