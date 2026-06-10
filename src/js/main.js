@@ -19,11 +19,11 @@ import {
 import {
   switchCapTab,
   carregarParametros, onChangeParamEmitente, abrirModalEditarParam, abrirModalAdicionarParam, salvarParam,
-  carregarFuncoes, abrirModalFuncao, abrirModalFuncaoId, salvarFuncao,
+  carregarFuncoes, abrirModalFuncao, abrirModalFuncaoId, salvarFuncao, toggleFuncaoAtivo,
   carregarProfissionais, abrirModalProfissional, abrirModalProfissionalId, salvarProfissional, toggleProfissionalAtivo,
-  carregarSolucoes, abrirModalSolucao, abrirModalSolucaoId, salvarSolucao,
-  carregarTabelaPrecos, filtrarTabelaPrecos, abrirModalItemTabela, abrirModalItemTabelaId, salvarItemTabela,
-  carregarServicosTerceiros, abrirModalServico, abrirModalServicoId, salvarServico,
+  carregarSolucoes, abrirModalSolucao, abrirModalSolucaoId, salvarSolucao, toggleSolucaoAtivo,
+  carregarTabelaPrecos, filtrarTabelaPrecos, abrirModalItemTabela, abrirModalItemTabelaId, salvarItemTabela, toggleItemTabelaAtivo,
+  carregarServicosTerceiros, abrirModalServico, abrirModalServicoId, salvarServico, toggleServicoAtivo,
 } from './capilaridade.js';
 
 // Expose all functions called from inline onclick attributes
@@ -42,11 +42,11 @@ Object.assign(window, {
   previewLogo, removerLogo, salvarEmitente,
   switchCapTab,
   carregarParametros, onChangeParamEmitente, abrirModalEditarParam, abrirModalAdicionarParam, salvarParam,
-  carregarFuncoes, abrirModalFuncao, abrirModalFuncaoId, salvarFuncao,
+  carregarFuncoes, abrirModalFuncao, abrirModalFuncaoId, salvarFuncao, toggleFuncaoAtivo,
   carregarProfissionais, abrirModalProfissional, abrirModalProfissionalId, salvarProfissional, toggleProfissionalAtivo,
-  carregarSolucoes, abrirModalSolucao, abrirModalSolucaoId, salvarSolucao,
-  carregarTabelaPrecos, filtrarTabelaPrecos, abrirModalItemTabela, abrirModalItemTabelaId, salvarItemTabela,
-  carregarServicosTerceiros, abrirModalServico, abrirModalServicoId, salvarServico,
+  carregarSolucoes, abrirModalSolucao, abrirModalSolucaoId, salvarSolucao, toggleSolucaoAtivo,
+  carregarTabelaPrecos, filtrarTabelaPrecos, abrirModalItemTabela, abrirModalItemTabelaId, salvarItemTabela, toggleItemTabelaAtivo,
+  carregarServicosTerceiros, abrirModalServico, abrirModalServicoId, salvarServico, toggleServicoAtivo,
 });
 
 // Close modal when clicking the overlay background

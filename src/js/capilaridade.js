@@ -295,7 +295,7 @@ export async function carregarFuncoes() {
         <td style="text-align:right;font-family:monospace;font-weight:700">${valorHora > 0 ? valorHora.toFixed(2).replace('.',',') : '—'}</td>
         <td>${isPool ? '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>' : '<span style="color:var(--text3);font-size:12px">Exclusivo</span>'}</td>
         <td><span class="${f.ativo ? 'pill-ativo' : 'pill-inativo'}">${f.ativo ? 'Ativo' : 'Inativo'}</span></td>
-        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalFuncaoId('${f.id}')" title="Editar">✏️</button></div></td>
+        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalFuncaoId('${f.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleFuncaoAtivo('${f.id}',${f.ativo})" title="${f.ativo ? 'Desativar' : 'Ativar'}">${f.ativo ? '🔴' : '🟢'}</button></div></td>
       </tr>`;
     });
     document.getElementById('cap-funcoes-body').innerHTML = html ||
@@ -502,6 +502,16 @@ export async function toggleProfissionalAtivo(id, ativo) {
   }
 }
 
+export async function toggleFuncaoAtivo(id, ativo) {
+  const novoAtivo = !ativo;
+  blockUI(novoAtivo ? 'Ativando função…' : 'Desativando função…');
+  try {
+    await api(`funcoes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ ativo: novoAtivo }) });
+    toast(novoAtivo ? 'Função ativada.' : 'Função desativada.', 'success');
+    await carregarFuncoes();
+  } catch (e) { toast('Erro: ' + e.message, 'error'); } finally { unblockUI(); }
+}
+
 // ============================================================
 // SOLUÇÕES
 // ============================================================
@@ -519,7 +529,7 @@ export async function carregarSolucoes() {
         <td>${escHtml(s.nome)}</td>
         <td style="color:var(--text2);font-size:12px">${escHtml(s.descricao || '—')}</td>
         <td><span class="${s.ativo ? 'pill-ativo' : 'pill-inativo'}">${s.ativo ? 'Ativo' : 'Inativo'}</span></td>
-        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalSolucaoId('${s.id}')" title="Editar">✏️</button></div></td>
+        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalSolucaoId('${s.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleSolucaoAtivo('${s.id}',${s.ativo})" title="${s.ativo ? 'Desativar' : 'Ativar'}">${s.ativo ? '🔴' : '🟢'}</button></div></td>
       </tr>`;
     });
     document.getElementById('cap-solucoes-body').innerHTML = html ||
@@ -580,6 +590,16 @@ export async function salvarSolucao() {
   }
 }
 
+export async function toggleSolucaoAtivo(id, ativo) {
+  const novoAtivo = !ativo;
+  blockUI(novoAtivo ? 'Ativando solução…' : 'Desativando solução…');
+  try {
+    await api(`solucoes?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ ativo: novoAtivo }) });
+    toast(novoAtivo ? 'Solução ativada.' : 'Solução desativada.', 'success');
+    await carregarSolucoes();
+  } catch (e) { toast('Erro: ' + e.message, 'error'); } finally { unblockUI(); }
+}
+
 // ============================================================
 // TABELA DE PREÇOS
 // ============================================================
@@ -616,7 +636,7 @@ function _renderTabelaPrecos() {
       <td style="font-family:monospace;font-size:11px">${i.tp || '—'}</td>
       <td style="text-align:right;font-weight:700;font-family:monospace">${preco}</td>
       <td><span class="${i.ativo ? 'pill-ativo' : 'pill-inativo'}">${i.ativo ? 'Ativo' : 'Inativo'}</span></td>
-      <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalItemTabelaId('${i.id}')" title="Editar">✏️</button></div></td>
+      <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalItemTabelaId('${i.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleItemTabelaAtivo('${i.id}',${i.ativo})" title="${i.ativo ? 'Desativar' : 'Ativar'}">${i.ativo ? '🔴' : '🟢'}</button></div></td>
     </tr>`;
   });
   document.getElementById('cap-tabela-body').innerHTML = html ||
@@ -704,6 +724,16 @@ export async function salvarItemTabela() {
   }
 }
 
+export async function toggleItemTabelaAtivo(id, ativo) {
+  const novoAtivo = !ativo;
+  blockUI(novoAtivo ? 'Ativando item…' : 'Desativando item…');
+  try {
+    await api(`tabela_precos?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ ativo: novoAtivo }) });
+    toast(novoAtivo ? 'Item ativado.' : 'Item desativado.', 'success');
+    await carregarTabelaPrecos();
+  } catch (e) { toast('Erro: ' + e.message, 'error'); } finally { unblockUI(); }
+}
+
 // ============================================================
 // SERVIÇOS DE TERCEIROS
 // ============================================================
@@ -728,7 +758,7 @@ export async function carregarServicosTerceiros() {
         <td>${s.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
         <td style="text-align:right;font-weight:700;font-family:monospace">${preco}</td>
         <td><span class="${s.ativo ? 'pill-ativo' : 'pill-inativo'}">${s.ativo ? 'Ativo' : 'Inativo'}</span></td>
-        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalServicoId('${s.id}')" title="Editar">✏️</button></div></td>
+        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalServicoId('${s.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleServicoAtivo('${s.id}',${s.ativo})" title="${s.ativo ? 'Desativar' : 'Ativar'}">${s.ativo ? '🔴' : '🟢'}</button></div></td>
       </tr>`;
     });
     document.getElementById('cap-servicos-body').innerHTML = html ||
@@ -809,4 +839,14 @@ export async function salvarServico() {
   } finally {
     unblockUI();
   }
+}
+
+export async function toggleServicoAtivo(id, ativo) {
+  const novoAtivo = !ativo;
+  blockUI(novoAtivo ? 'Ativando serviço…' : 'Desativando serviço…');
+  try {
+    await api(`servicos_terceiros?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ ativo: novoAtivo }) });
+    toast(novoAtivo ? 'Serviço ativado.' : 'Serviço desativado.', 'success');
+    await carregarServicosTerceiros();
+  } catch (e) { toast('Erro: ' + e.message, 'error'); } finally { unblockUI(); }
 }
