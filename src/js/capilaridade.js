@@ -353,7 +353,10 @@ export async function carregarProfissionais() {
         <td>${tipoLabel[p.tipo] || p.tipo}</td>
         <td>${p.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
         <td><span class="${p.ativo ? 'pill-ativo' : 'pill-inativo'}">${p.ativo ? 'Ativo' : 'Inativo'}</span></td>
-        <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalProfissionalId('${p.id}')" title="Editar">✏️</button></div></td>
+        <td><div class="row-actions">
+          <button class="icon-btn btn-sm" onclick="abrirModalProfissionalId('${p.id}')" title="Editar">✏️</button>
+          <button class="icon-btn btn-sm" onclick="toggleProfissionalAtivo('${p.id}',${p.ativo})" title="${p.ativo ? 'Desativar' : 'Ativar'}">${p.ativo ? '🔴' : '🟢'}</button>
+        </div></td>
       </tr>`;
     });
     document.getElementById('cap-profissionais-body').innerHTML = html ||
@@ -418,6 +421,23 @@ export async function salvarProfissional() {
     const msg = e.message.includes('profissionais_cpf_cnpj_unique')
       ? 'Este CPF/CNPJ já está cadastrado.' : 'Erro: ' + e.message;
     toast(msg, 'error');
+  } finally {
+    unblockUI();
+  }
+}
+
+export async function toggleProfissionalAtivo(id, ativo) {
+  const novoAtivo = !ativo;
+  blockUI(novoAtivo ? 'Ativando profissional…' : 'Desativando profissional…');
+  try {
+    await api(`profissionais?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ ativo: novoAtivo }),
+    });
+    toast(novoAtivo ? 'Profissional ativado.' : 'Profissional desativado.', 'success');
+    await carregarProfissionais();
+  } catch (e) {
+    toast('Erro: ' + e.message, 'error');
   } finally {
     unblockUI();
   }
