@@ -442,7 +442,27 @@ export async function salvarEmitente() {
       payload.grupo_numeracao_id = grupoId;
       payload.compartilha_travado = false;
       payload.criado_por = state.currentUser.id;
-      await api('emitentes', { method: 'POST', body: JSON.stringify(payload) });
+      const novoEmitente = await api('emitentes', { method: 'POST', body: JSON.stringify(payload) });
+      const novoId = novoEmitente[0].id;
+      const agora = new Date().toISOString();
+      const uid = state.currentUser.id;
+      const paramsDefault = [
+        { emitente_id: novoId, tipo: 'tributo',        codigo: 'ISS',        descricao: 'ISS',                   percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'tributo',        codigo: 'PIS',        descricao: 'PIS',                   percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'tributo',        codigo: 'COFINS',     descricao: 'COFINS',                percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'tributo',        codigo: 'IR',         descricao: 'IRPJ',                  percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'tributo',        codigo: 'CSLL',       descricao: 'CSLL',                  percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'tributo',        codigo: 'CPP',        descricao: 'CPP',                   percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'encargo_social', codigo: 'AT',         descricao: 'Autônomo/Terceiros',    percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'encargo_social', codigo: 'HR',         descricao: 'Encargos Horista',      percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'encargo_social', codigo: 'MS',         descricao: 'Encargos Mensalista',   percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'bdi_parcela',    codigo: 'ADM_CENTRAL',descricao: 'Administração Central', percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'bdi_parcela',    codigo: 'DESP_FINANC',descricao: 'Despesas Financeiras',  percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'bdi_parcela',    codigo: 'LUCRO',      descricao: 'Lucro',                 percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'bdi_parcela',    codigo: 'RISCOS',     descricao: 'Riscos e Imprevistos',  percentual: 0, vigente_de: agora, alterado_por: uid },
+        { emitente_id: novoId, tipo: 'bdi_parcela',    codigo: 'SEGUROS',    descricao: 'Seguros e Garantias',   percentual: 0, vigente_de: agora, alterado_por: uid },
+      ];
+      await api('emitentes_parametros_historico', { method: 'POST', body: JSON.stringify(paramsDefault) });
       toast('Emitente criado ✓', 'success');
     }
     closeModal('modal-emitente');
