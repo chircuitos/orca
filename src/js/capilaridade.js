@@ -1,6 +1,6 @@
 import { state } from './state.js';
 import { api } from './api.js';
-import { escHtml } from './utils.js';
+import { escHtml, formatCPF, formatCNPJ } from './utils.js';
 import { openModal, closeModal, blockUI, unblockUI, toast } from './ui.js';
 
 let _funcoes = [];
@@ -308,15 +308,19 @@ export async function salvarFuncao() {
       });
       funcao_id = res[0].id;
     }
-    // Upsert encargos complementares (UNIQUE funcao_id, categoria)
-    for (const c of ENCARGOS_CATS) {
-      const inp = document.getElementById('fn-enc-'+c.key);
-      const raw = inp?.value?.replace(',','.') || '';
-      const valor_mensal = raw ? parseFloat(raw) : 0;
+    // Substituir encargos: deletar os existentes e reinserir os preenchidos
+    await api(`funcoes_encargos_complementares?funcao_id=eq.${funcao_id}`, { method: 'DELETE' });
+    const encargos = ENCARGOS_CATS
+      .map(c => {
+        const raw = document.getElementById('fn-enc-'+c.key)?.value?.replace(',','.') || '';
+        const valor_mensal = raw ? parseFloat(raw) : 0;
+        return { funcao_id, categoria: c.key, valor_mensal, horas_mensais: 220 };
+      })
+      .filter(e => e.valor_mensal > 0);
+    if (encargos.length > 0) {
       await api('funcoes_encargos_complementares', {
         method: 'POST',
-        prefer: 'resolution=merge-duplicates',
-        body: JSON.stringify({ funcao_id, categoria: c.key, valor_mensal, horas_mensais: 220 }),
+        body: JSON.stringify(encargos),
       });
     }
     closeModal('modal-funcao');
@@ -334,7 +338,7 @@ export async function salvarFuncao() {
 // ============================================================
 
 export async function carregarProfissionais() {
-  document.getElementById('cap-profissionais-body').innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  document.getElementById('cap-profissionais-body').innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
     _profissionais = await api('profissionais?select=*&order=nome.asc') || [];
     const ativoFiltro = document.getElementById('prof-filtro-ativo')?.value ?? 'true';
@@ -342,8 +346,10 @@ export async function carregarProfissionais() {
     const tipoLabel = { colaborador: 'Colaborador', terceiro_pj: 'Terceiro PJ', freelancer: 'Freelancer' };
     let html = '';
     lista.forEach(p => {
+      const doc = p.cpf_cnpj ? (p.cpf_cnpj.length === 11 ? formatCPF(p.cpf_cnpj) : formatCNPJ(p.cpf_cnpj)) : '—';
       html += `<tr>
         <td>${escHtml(p.nome)}</td>
+        <td style="font-family:monospace;font-size:12px">${escHtml(doc)}</td>
         <td>${tipoLabel[p.tipo] || p.tipo}</td>
         <td>${p.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
         <td><span class="${p.ativo ? 'pill-ativo' : 'pill-inativo'}">${p.ativo ? 'Ativo' : 'Inativo'}</span></td>
@@ -351,9 +357,9 @@ export async function carregarProfissionais() {
       </tr>`;
     });
     document.getElementById('cap-profissionais-body').innerHTML = html ||
-      '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">Nenhum profissional cadastrado</div></div></td></tr>';
+      '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">👤</div><div class="empty-title">Nenhum profissional cadastrado</div></div></td></tr>';
   } catch (e) {
-    document.getElementById('cap-profissionais-body').innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+    document.getElementById('cap-profissionais-body').innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
   }
 }
 
@@ -361,6 +367,7 @@ export function abrirModalProfissional() {
   _profEditandoId = null;
   document.getElementById('modal-prof-title').textContent = 'Novo Profissional';
   document.getElementById('prof-nome').value = '';
+  document.getElementById('prof-cpf-cnpj').value = '';
   document.getElementById('prof-tipo').value = 'colaborador';
   document.getElementById('prof-ativo').checked = true;
   document.getElementById('prof-pool').checked = true;
@@ -373,6 +380,7 @@ export function abrirModalProfissionalId(id) {
   _profEditandoId = id;
   document.getElementById('modal-prof-title').textContent = 'Editar Profissional';
   document.getElementById('prof-nome').value = p.nome;
+  document.getElementById('prof-cpf-cnpj').value = p.cpf_cnpj || '';
   document.getElementById('prof-tipo').value = p.tipo;
   document.getElementById('prof-ativo').checked = p.ativo;
   document.getElementById('prof-pool').checked = !p.emitente_id;
@@ -381,29 +389,35 @@ export function abrirModalProfissionalId(id) {
 
 export async function salvarProfissional() {
   const nome = document.getElementById('prof-nome').value.trim();
+  const cpf_cnpj = document.getElementById('prof-cpf-cnpj').value.replace(/\D/g, '') || null;
   const tipo = document.getElementById('prof-tipo').value;
   const ativo = document.getElementById('prof-ativo').checked;
   const isPool = document.getElementById('prof-pool').checked;
   const emitente_id = isPool ? null : (state.emitentesDoUsuario[0]?.id || null);
   if (!nome) { toast('Informe o nome do profissional.', 'error'); return; }
+  if (cpf_cnpj && cpf_cnpj.length !== 11 && cpf_cnpj.length !== 14) {
+    toast('CPF deve ter 11 dígitos e CNPJ 14 dígitos.', 'error'); return;
+  }
   blockUI('Salvando profissional…');
   try {
     if (_profEditandoId) {
       await api(`profissionais?id=eq.${_profEditandoId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ nome, tipo, ativo }),
+        body: JSON.stringify({ nome, cpf_cnpj, tipo, ativo }),
       });
     } else {
       await api('profissionais', {
         method: 'POST',
-        body: JSON.stringify({ nome, tipo, ativo, emitente_id, criado_por: state.currentUser.id }),
+        body: JSON.stringify({ nome, cpf_cnpj, tipo, ativo, emitente_id, criado_por: state.currentUser.id }),
       });
     }
     closeModal('modal-profissional');
     toast('Profissional salvo.', 'success');
     await carregarProfissionais();
   } catch (e) {
-    toast('Erro: ' + e.message, 'error');
+    const msg = e.message.includes('profissionais_cpf_cnpj_unique')
+      ? 'Este CPF/CNPJ já está cadastrado.' : 'Erro: ' + e.message;
+    toast(msg, 'error');
   } finally {
     unblockUI();
   }

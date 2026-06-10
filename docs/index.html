@@ -6,7 +6,7 @@
 <title>Orca — Orçamentos d'Avila</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/orca/assets/index-COEt_ayv.js"></script>
+  <script type="module" crossorigin src="/orca/assets/index-Dn79pJvj.js"></script>
   <link rel="stylesheet" crossorigin href="/orca/assets/index-B7zQ6Zh2.css">
 </head>
 <body>
@@ -223,8 +223,8 @@
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Nome</th><th>Tipo</th><th>Escopo</th><th>Situação</th><th style="width:48px"></th></tr></thead>
-          <tbody id="cap-profissionais-body"><tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+          <thead><tr><th>Nome</th><th>CPF / CNPJ</th><th>Tipo</th><th>Escopo</th><th>Situação</th><th style="width:48px"></th></tr></thead>
+          <tbody id="cap-profissionais-body"><tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -547,6 +547,7 @@
     <div class="modal-body">
       <div class="form-grid form-grid-2">
         <div class="form-group span2"><label>Nome <span style="color:var(--red)">*</span></label><input type="text" id="prof-nome" placeholder="Nome completo do profissional"></div>
+        <div class="form-group span2"><label>CPF / CNPJ</label><input type="text" id="prof-cpf-cnpj" placeholder="Somente números — 11 dígitos (CPF) ou 14 (CNPJ)" maxlength="18"><span class="field-hint">Usado para evitar cadastros duplicados.</span></div>
         <div class="form-group"><label>Tipo</label>
           <select id="prof-tipo">
             <option value="colaborador">Colaborador (CLT)</option>
