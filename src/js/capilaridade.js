@@ -133,7 +133,9 @@ function _renderParametros(params, emitId) {
   let html = '';
   sections.forEach(s => {
     const list = params.filter(p => p.tipo === s.tipo);
-    const total = list.reduce((sum, p) => sum + parseFloat(p.percentual), 0);
+    const total = s.tipo !== 'encargo_social'
+      ? list.reduce((sum, p) => sum + parseFloat(p.percentual), 0)
+      : null;
     html += `<div class="param-section">
       <div class="param-section-header">
         <span>${s.icon} ${s.label}</span>
@@ -154,11 +156,13 @@ function _renderParametros(params, emitId) {
           <td><button class="icon-btn btn-sm" onclick="abrirModalEditarParam('${p.emitente_id}','${p.tipo}','${escHtml(p.codigo)}','${escHtml(desc)}',${p.percentual})" title="Editar">✏️</button></td>
         </tr>`;
       });
-      html += `<tr style="border-top:2px solid var(--border);background:var(--surface2)">
-        <td colspan="2" style="font-weight:700;font-size:12px;color:var(--text2)">TOTAL</td>
-        <td style="text-align:right;font-weight:800;font-family:monospace">${total.toFixed(4).replace('.',',')}%</td>
-        <td></td>
-      </tr>`;
+      if (total !== null) {
+        html += `<tr style="border-top:2px solid var(--border);background:var(--surface2)">
+          <td colspan="2" style="font-weight:700;font-size:12px;color:var(--text2)">TOTAL</td>
+          <td style="text-align:right;font-weight:800;font-family:monospace">${total.toFixed(4).replace('.',',')}%</td>
+          <td></td>
+        </tr>`;
+      }
     }
     html += `</tbody></table></div>`;
 
