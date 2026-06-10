@@ -39,8 +39,8 @@ export function switchCapTab(tab) {
     'funcoes':            'Funções / Cargos',
     'profissionais':      'Profissionais',
     'solucoes':           'Soluções',
-    'tabela-precos':      'Tabela de Preços',
-    'servicos-terceiros': 'Serviços de Terceiros',
+    'tabela-precos':      'Itens Tabelados',
+    'servicos-terceiros': 'Terceiros',
   };
   const btnTextos = {
     'parametros':         null,
