@@ -205,8 +205,8 @@
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Nome da Função</th><th>Req. Pessoa</th><th style="text-align:right">Valor Hora Base</th><th style="text-align:right">Enc. Compl./HH</th><th>Escopo</th><th>Situação</th><th style="width:48px"></th></tr></thead>
-          <tbody id="cap-funcoes-body"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+          <thead><tr><th>Nome da Função</th><th>Req. Pessoa</th><th style="text-align:right">Valor Base</th><th style="text-align:right">Complemento</th><th style="text-align:right">Valor Hora</th><th>Escopo</th><th>Situação</th><th style="width:48px"></th></tr></thead>
+          <tbody id="cap-funcoes-body"><tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -515,7 +515,8 @@
       <div class="form-grid form-grid-2">
         <div class="form-section-title">Dados da Função</div>
         <div class="form-group span2"><label>Nome da Função <span style="color:var(--red)">*</span></label><input type="text" id="fn-nome" placeholder="ex: Coordenador Geral, Biólogo Sênior"></div>
-        <div class="form-group"><label>Valor Hora Padrão (R$/HH)</label><input type="number" id="fn-valor-hora" step="0.01" min="0" placeholder="ex: 85.00"></div>
+        <div class="form-group"><label>Valor Base (R$/H)</label><input type="number" id="fn-valor-hora" step="0.01" min="0" placeholder="ex: 85.00"></div>
+        <div class="form-group"><label>Horas mensais p/ cálculo do complemento</label><input type="number" id="fn-horas-mensais" step="1" min="1" placeholder="ex: 220" value="220"><span class="field-hint">220 = nominais · 176 = efetivas CLT · 88 = meio período</span></div>
         <div class="form-group" style="display:flex;flex-direction:column;justify-content:flex-end">
           <div class="checkbox-row"><input type="checkbox" id="fn-requer-pessoa"><label for="fn-requer-pessoa">Requer pessoa associada</label></div>
           <div class="checkbox-row"><input type="checkbox" id="fn-pool" checked><label for="fn-pool">Pool compartilhado (d'Avila)</label></div>

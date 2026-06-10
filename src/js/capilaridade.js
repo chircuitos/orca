@@ -277,28 +277,31 @@ export async function salvarParam() {
 export async function carregarFuncoes() {
   document.getElementById('cap-funcoes-body').innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _funcoes = await api('funcoes?select=*,funcoes_encargos_complementares(categoria,valor_mensal,valor_hora)&order=nome.asc') || [];
+    _funcoes = await api('funcoes?select=*,funcoes_encargos_complementares(categoria,valor_mensal,valor_hora,horas_mensais)&order=nome.asc') || [];
     const ativoFiltro = document.getElementById('funcoes-filtro-ativo')?.value ?? 'true';
     const lista = ativoFiltro === '' ? _funcoes : _funcoes.filter(f => String(f.ativo) === ativoFiltro);
     let html = '';
     lista.forEach(f => {
       const encs = f.funcoes_encargos_complementares || [];
       const totalCompl = encs.reduce((s, e) => s + (parseFloat(e.valor_hora) || 0), 0);
+      const valorBase = parseFloat(f.valor_hora_padrao || 0);
+      const valorHora = valorBase + totalCompl;
       const isPool = !f.emitente_id;
       html += `<tr>
         <td>${escHtml(f.nome)}</td>
         <td style="text-align:center">${f.requer_pessoa ? '<span class="pill-ativo" style="font-size:10px">Sim</span>' : '<span style="color:var(--text3)">—</span>'}</td>
-        <td style="text-align:right;font-family:monospace">R$ ${parseFloat(f.valor_hora_padrao||0).toFixed(2).replace('.',',')}/HH</td>
-        <td style="text-align:right;font-family:monospace;font-size:12px;color:var(--text2)">${totalCompl > 0 ? '+ R$ '+totalCompl.toFixed(4).replace('.',',')+'/HH' : '—'}</td>
+        <td style="text-align:right;font-family:monospace">${valorBase.toFixed(2).replace('.',',')}</td>
+        <td style="text-align:right;font-family:monospace;font-size:12px;color:var(--text2)">${totalCompl > 0 ? totalCompl.toFixed(2).replace('.',',') : '—'}</td>
+        <td style="text-align:right;font-family:monospace;font-weight:700">${valorHora > 0 ? valorHora.toFixed(2).replace('.',',') : '—'}</td>
         <td>${isPool ? '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>' : '<span style="color:var(--text3);font-size:12px">Exclusivo</span>'}</td>
         <td><span class="${f.ativo ? 'pill-ativo' : 'pill-inativo'}">${f.ativo ? 'Ativo' : 'Inativo'}</span></td>
         <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalFuncaoId('${f.id}')" title="Editar">✏️</button></div></td>
       </tr>`;
     });
     document.getElementById('cap-funcoes-body').innerHTML = html ||
-      '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👷</div><div class="empty-title">Nenhuma função cadastrada</div></div></td></tr>';
+      '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👷</div><div class="empty-title">Nenhuma função cadastrada</div></div></td></tr>';
   } catch (e) {
-    document.getElementById('cap-funcoes-body').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+    document.getElementById('cap-funcoes-body').innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
   }
 }
 
@@ -308,6 +311,7 @@ export function abrirModalFuncao() {
   document.getElementById('fn-nome').value = '';
   document.getElementById('fn-requer-pessoa').checked = false;
   document.getElementById('fn-valor-hora').value = '';
+  document.getElementById('fn-horas-mensais').value = 220;
   document.getElementById('fn-ativo').checked = true;
   document.getElementById('fn-pool').checked = true;
   ENCARGOS_CATS.forEach(c => {
@@ -328,6 +332,7 @@ export function abrirModalFuncaoId(id) {
   document.getElementById('fn-ativo').checked = f.ativo;
   document.getElementById('fn-pool').checked = !f.emitente_id;
   const encs = f.funcoes_encargos_complementares || [];
+  document.getElementById('fn-horas-mensais').value = encs.length > 0 ? (encs[0].horas_mensais || 220) : 220;
   ENCARGOS_CATS.forEach(c => {
     const e = encs.find(x => x.categoria === c.key);
     const inp = document.getElementById('fn-enc-'+c.key);
@@ -363,11 +368,12 @@ export async function salvarFuncao() {
     }
     // Substituir encargos: deletar os existentes e reinserir os preenchidos
     await api(`funcoes_encargos_complementares?funcao_id=eq.${funcao_id}`, { method: 'DELETE' });
+    const horas_mensais = parseInt(document.getElementById('fn-horas-mensais').value) || 220;
     const encargos = ENCARGOS_CATS
       .map(c => {
         const raw = document.getElementById('fn-enc-'+c.key)?.value?.replace(',','.') || '';
         const valor_mensal = raw ? parseFloat(raw) : 0;
-        return { funcao_id, categoria: c.key, valor_mensal, horas_mensais: 220 };
+        return { funcao_id, categoria: c.key, valor_mensal, horas_mensais };
       })
       .filter(e => e.valor_mensal > 0);
     if (encargos.length > 0) {
