@@ -80,7 +80,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .data-table tbody tr.clickable:hover{background:var(--azul-pale)}
 .data-table tbody tr.row-selected{background:var(--azul-light)!important}
 .data-table tbody tr.suspensa{opacity:.55;font-style:italic}
-
 /* PILLS */
 .status-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;border:1px solid}
 .s-em_elaboracao{background:#fff8e1;color:#b7720a;border-color:#f5c842}
@@ -88,6 +87,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .s-em_follow_up{background:#e3f2fd;color:#1565c0;border-color:#64b5f6}
 .s-em_revisao{background:#fce4ec;color:#ad1457;border-color:#f48fb1}
 .s-suspensa{background:var(--cinza-pale);color:var(--cinza-mid);border-color:var(--cinza-light)}
+/* Botão ação de suspensão na linha da tabela */
+.btn-suspensao{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;font-size:14px;color:var(--text3);transition:background .15s,color .15s}
+.btn-suspensao:hover{background:var(--cinza-pale);color:var(--text1)}
 .s-conquistada{background:#e8f5e9;color:#1b5e20;border-color:#81c784}
 .s-perdida{background:#ffebee;color:#b71c1c;border-color:#ef9a9a}
 .s-cancelada{background:var(--cinza-pale);color:var(--text3);border-color:var(--cinza-light)}
@@ -258,7 +260,7 @@ input[type=file]{padding:6px;font-size:12px;cursor:pointer}
   <div class="login-card">
     <div class="login-header">
       <div class="login-title">Sistema de Orçamentos</div>
-      <div class="login-sub">Versão compartilhada 1.16 — 09/jun/2026</div>
+      <div class="login-sub">Versão compartilhada 1.17 — 09/jun/2026</div>
     </div>
     <div class="login-body">
       <div class="login-error" id="login-error"></div>
@@ -294,7 +296,7 @@ input[type=file]{padding:6px;font-size:12px;cursor:pointer}
     </div>
     <div class="table-wrap">
       <table class="data-table">
-        <thead><tr><th>Proposta</th><th>Emitente</th><th>Cliente</th><th>Objetivo</th><th>Status</th><th>Criada em</th></tr></thead>
+        <thead><tr><th>Proposta</th><th>Emitente</th><th>Cliente</th><th>Objetivo</th><th>Status</th><th>Criada em</th><th style="width:36px"></th></tr></thead>
         <tbody id="tabela-propostas"><tr><td colspan="6"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr></tbody>
       </table>
     </div>
@@ -572,6 +574,27 @@ input[type=file]{padding:6px;font-size:12px;cursor:pointer}
   </div>
 </div>
 
+<!-- Modal Suspensão / Liberação -->
+<div class="modal-overlay" id="modal-suspensao">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-suspensao-title">Suspender Proposta</span>
+      <button class="modal-close" onclick="closeModal('modal-suspensao')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="modal-suspensao-desc" style="margin-bottom:14px;color:var(--text2);font-size:13px;line-height:1.5"></p>
+      <div class="form-group">
+        <label>Justificativa <span style="color:#c0392b">*</span></label>
+        <textarea id="suspensao-justificativa" rows="3" placeholder="Descreva o motivo…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-suspensao')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-confirmar-suspensao" onclick="confirmarAlteracaoSuspensao()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <div class="block-overlay" id="block-overlay"><div class="spinner"></div><p id="block-msg">Processando…</p></div>
 <div class="toast-container" id="toasts"></div>
 
@@ -584,6 +607,7 @@ let currentPropTab='ativas',currentAdminTab='usuarios';
 let todasPropostas=[],todosEmitentes=[],todasPessoas=[];
 let pessoaSelecionadaId=null,editandoUsuarioId=null,editandoPessoaId=null;
 let editandoContatoId=null,editandoEmitenteId=null;
+let _suspensaoAtual={id:null,acao:null};
 let emLogoBase64=null,emLogoRemovido=false;
 // emitentesDoUsuario: [{id, prefixo, compartilha_davila}] — emitentes associados ao usuário logado
 let emitentesDoUsuario=[];
@@ -724,7 +748,7 @@ async function showSection(sec){
 async function carregarPropostas(){
   document.getElementById('tabela-propostas').innerHTML='<tr><td colspan="6"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr>';
   try{
-    todasPropostas=await api('propostas?select=id,prefixo,ano,numero,revisao,status,objetivo,criado_em,emitentes(nome_fantasia,prefixo),pessoas(razao_social)&order=criado_em.desc')||[];
+    todasPropostas=await api('propostas?select=id,prefixo,ano,numero,revisao,status,objetivo,criado_em,criado_por,emitentes(nome_fantasia,prefixo),pessoas(razao_social)&order=criado_em.desc')||[];
     atualizarStatsPropostas();renderPropostas();
     await carregarSelectsNovaProposta();
   }catch(e){
@@ -759,6 +783,14 @@ function renderPropostas(){
   }
   tbody.innerHTML=lista.map(p=>{
     const num=`${p.prefixo}-ORC-${String(p.ano).slice(-2)}${String(p.numero).padStart(3,'0')}`;
+    const podeAgir=currentUser.is_admin||p.criado_por===currentUser.id;
+    const statusSuspendivel=['em_elaboracao','emitida','em_follow_up','em_revisao'].includes(p.status);
+    let btnAcao='';
+    if(podeAgir&&p.status==='suspensa'){
+      btnAcao=`<button class="btn-suspensao" title="Liberar suspensão" onclick="abrirModalSuspensao('${p.id}','liberar',event)">▶</button>`;
+    }else if(podeAgir&&statusSuspendivel){
+      btnAcao=`<button class="btn-suspensao" title="Suspender proposta" onclick="abrirModalSuspensao('${p.id}','suspender',event)">⏸</button>`;
+    }
     return `<tr class="clickable${p.status==='suspensa'?' suspensa':''}" onclick="abrirProposta('${p.id}')">
       <td><span class="prop-num">${num}</span><span class="prop-rev">REV${String(p.revisao).padStart(2,'0')}</span></td>
       <td><span class="emit-tag">${escHtml(p.emitentes?.nome_fantasia||p.emitentes?.prefixo||'—')}</span></td>
@@ -766,6 +798,7 @@ function renderPropostas(){
       <td><div class="obj-text" title="${escHtml(p.objetivo||'')}">${escHtml(p.objetivo||'—')}</div></td>
       <td><span class="status-pill s-${p.status}">${STATUS[p.status]||p.status}</span></td>
       <td><span class="date-text">${new Date(p.criado_em).toLocaleDateString('pt-BR')}</span></td>
+      <td style="text-align:center">${btnAcao}</td>
     </tr>`;
   }).join('');
 }
@@ -850,6 +883,39 @@ async function criarProposta(){
   unblockUI();
 }
 function abrirProposta(){toast('Tela da proposta em desenvolvimento','warn');}
+function abrirModalSuspensao(id,acao,event){
+  event.stopPropagation();
+  const p=todasPropostas.find(x=>x.id===id);
+  if(!p)return;
+  const num=`${p.prefixo}-ORC-${String(p.ano).slice(-2)}${String(p.numero).padStart(3,'0')}-REV${String(p.revisao).padStart(2,'0')}`;
+  _suspensaoAtual={id,acao};
+  document.getElementById('modal-suspensao-title').textContent=acao==='suspender'?'Suspender Proposta':'Liberar Suspensão';
+  document.getElementById('modal-suspensao-desc').textContent=acao==='suspender'
+    ?`A proposta ${num} será suspensa e não poderá ser editada até ser liberada. Informe a justificativa:`
+    :`A proposta ${num} voltará ao status anterior à suspensão. Informe a justificativa:`;
+  document.getElementById('suspensao-justificativa').value='';
+  document.getElementById('btn-confirmar-suspensao').textContent=acao==='suspender'?'Suspender':'Liberar';
+  document.getElementById('btn-confirmar-suspensao').className='btn '+(acao==='suspender'?'btn-danger':'btn-primary');
+  openModal('modal-suspensao');
+  setTimeout(()=>document.getElementById('suspensao-justificativa').focus(),150);
+}
+async function confirmarAlteracaoSuspensao(){
+  const just=document.getElementById('suspensao-justificativa').value.trim();
+  if(!just){toast('Informe a justificativa.','warn');return;}
+  blockUI('Processando…');
+  try{
+    await api('rpc/alterar_suspensao_proposta',{method:'POST',body:JSON.stringify({
+      p_proposta_id:_suspensaoAtual.id,
+      p_acao:_suspensaoAtual.acao,
+      p_justificativa:just
+    })});
+    closeModal('modal-suspensao');
+    const msg=_suspensaoAtual.acao==='suspender'?'Proposta suspensa.':'Suspensão liberada.';
+    toast(msg,'success');
+    await carregarPropostas();
+  }catch(e){toast('Erro: '+e.message,'error');}
+  unblockUI();
+}
 
 // ══ CADASTROS — PESSOAS ══
 async function carregarPessoas(){
