@@ -190,21 +190,24 @@ function _renderBdiTcu(params) {
   const bdi = ((1 + AC + SG + R) * (1 + DF) * (1 + L)) / (1 - I) - 1;
   const bdiPct = (bdi * 100).toFixed(4).replace('.', ',');
 
+  const tdBase = 'style="padding:4px 14px;font-size:12px;color:var(--text2)"';
+  const tdVal  = 'style="padding:4px 14px;text-align:right;font-family:monospace;font-size:12px;color:var(--text2)"';
+  const tdCode = 'style="padding:4px 14px;font-size:12px;font-family:monospace;font-weight:700;color:var(--text2);width:40px"';
   return `<div class="param-section" style="border:2px solid var(--azul);background:var(--azul-light)">
     <div class="param-section-header" style="color:var(--azul)">
       <span>📐 BDI Calculado — Fórmula TCU</span>
     </div>
     <table class="data-table">
       <tbody>
-        <tr><td style="color:var(--text2);font-size:12px">AC</td><td style="color:var(--text2);font-size:12px">Administração Central</td><td style="text-align:right;font-family:monospace;font-size:12px">${(AC*100).toFixed(4).replace('.',',')}%</td></tr>
-        <tr><td style="color:var(--text2);font-size:12px">S+G</td><td style="color:var(--text2);font-size:12px">Seguros e Garantias</td><td style="text-align:right;font-family:monospace;font-size:12px">${(SG*100).toFixed(4).replace('.',',')}%</td></tr>
-        <tr><td style="color:var(--text2);font-size:12px">R</td><td style="color:var(--text2);font-size:12px">Riscos</td><td style="text-align:right;font-family:monospace;font-size:12px">${(R*100).toFixed(4).replace('.',',')}%</td></tr>
-        <tr><td style="color:var(--text2);font-size:12px">DF</td><td style="color:var(--text2);font-size:12px">Despesas Financeiras</td><td style="text-align:right;font-family:monospace;font-size:12px">${(DF*100).toFixed(4).replace('.',',')}%</td></tr>
-        <tr><td style="color:var(--text2);font-size:12px">L</td><td style="color:var(--text2);font-size:12px">Lucro</td><td style="text-align:right;font-family:monospace;font-size:12px">${(L*100).toFixed(4).replace('.',',')}%</td></tr>
-        <tr><td style="color:var(--text2);font-size:12px">I</td><td style="color:var(--text2);font-size:12px">Impostos (soma dos Tributos)</td><td style="text-align:right;font-family:monospace;font-size:12px">${(I*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td ${tdCode}>AC</td><td ${tdBase}>Administração Central</td><td ${tdVal}>${(AC*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td ${tdCode}>S+G</td><td ${tdBase}>Seguros e Garantias</td><td ${tdVal}>${(SG*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td ${tdCode}>R</td><td ${tdBase}>Riscos</td><td ${tdVal}>${(R*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td ${tdCode}>DF</td><td ${tdBase}>Despesas Financeiras</td><td ${tdVal}>${(DF*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td ${tdCode}>L</td><td ${tdBase}>Lucro</td><td ${tdVal}>${(L*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td ${tdCode}>I</td><td ${tdBase}>Impostos (soma dos Tributos)</td><td ${tdVal}>${(I*100).toFixed(4).replace('.',',')}%</td></tr>
         <tr style="border-top:2px solid var(--azul)">
-          <td colspan="2" style="font-weight:800;color:var(--azul)">BDI = ((1 + AC + S + R + G) × (1 + DF) × (1 + L)) / (1 − I) − 1</td>
-          <td style="text-align:right;font-weight:800;font-family:monospace;font-size:16px;color:var(--azul)">${bdiPct}%</td>
+          <td colspan="2" style="padding:6px 14px;font-weight:800;color:var(--azul);font-size:12px">BDI = ((1 + AC + S + R + G) × (1 + DF) × (1 + L)) / (1 − I) − 1</td>
+          <td style="padding:6px 14px;text-align:right;font-weight:800;font-family:monospace;font-size:16px;color:var(--azul)">${bdiPct}%</td>
         </tr>
       </tbody>
     </table>
