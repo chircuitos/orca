@@ -67,6 +67,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:0 2
 .data-table th{font-size:10px;font-weight:800;color:var(--azul);text-transform:uppercase;letter-spacing:1.1px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
 .data-table td{padding:11px 14px;vertical-align:middle;border-bottom:1px solid var(--border-light);font-size:13px;color:var(--text)}
 .data-table tr:last-child td{border-bottom:none}
+.data-table.compact td{padding:4px 14px}
 .data-table tbody tr.clickable{cursor:pointer;transition:background .1s}
 .data-table tbody tr.clickable:hover{background:var(--azul-pale)}
 .data-table tbody tr.row-selected{background:var(--azul-light)!important}
