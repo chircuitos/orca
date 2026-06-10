@@ -5,6 +5,7 @@ import { toast } from './ui.js';
 import { carregarPropostas } from './propostas.js';
 import { carregarPessoas } from './pessoas.js';
 import { carregarEmitentesBase, switchAdminTab } from './admin.js';
+import { switchCapTab } from './capilaridade.js';
 
 export async function login() {
   const email = document.getElementById('login-email').value.trim();
@@ -71,12 +72,13 @@ export function logout() {
   document.getElementById('nav-admin').style.display = 'none';
   document.getElementById('user-role-badge').style.display = 'none';
   document.getElementById('btn-nova-proposta').style.display = 'none';
-  ['propostas','cadastros','admin'].forEach(s => {
+  ['propostas','cadastros','admin','capilaridade'].forEach(s => {
     const el = document.getElementById('section-'+s);
     if (el) el.style.display = s === 'propostas' ? 'block' : 'none';
     const nb = document.getElementById('nav-'+s);
     if (nb) nb.classList.toggle('active', s === 'propostas');
   });
+  document.getElementById('nav-capilaridade').style.display = 'none';
   state.currentAdminTab = 'usuarios';
 }
 
@@ -90,7 +92,7 @@ export async function iniciarApp() {
   document.getElementById('nav-sep').style.display = 'block';
   document.getElementById('status-badge').textContent = '● Online';
   document.getElementById('status-badge').style.color = 'var(--azul)';
-  ['propostas','cadastros','admin'].forEach(s => {
+  ['propostas','cadastros','admin','capilaridade'].forEach(s => {
     const el = document.getElementById('section-'+s);
     if (el) el.style.display = s === 'propostas' ? 'block' : 'none';
     const nb = document.getElementById('nav-'+s);
@@ -98,14 +100,15 @@ export async function iniciarApp() {
   });
   if (state.currentUser.is_admin) {
     document.getElementById('nav-admin').style.display = 'flex';
+    document.getElementById('nav-capilaridade').style.display = 'flex';
     document.getElementById('user-role-badge').style.display = 'inline';
   }
   document.getElementById('btn-nova-proposta').style.display = state.currentUser.pode_criar_proposta ? '' : 'none';
   try {
     if (state.currentUser.is_admin) {
-      state.emitentesDoUsuario = await api('emitentes?ativo=eq.true&select=id,prefixo,compartilha_davila') || [];
+      state.emitentesDoUsuario = await api('emitentes?ativo=eq.true&select=id,prefixo,nome_fantasia,compartilha_davila') || [];
     } else {
-      const assoc = await api(`usuarios_emitentes?usuario_id=eq.${state.currentUser.id}&select=emitentes(id,prefixo,compartilha_davila)`) || [];
+      const assoc = await api(`usuarios_emitentes?usuario_id=eq.${state.currentUser.id}&select=emitentes(id,prefixo,nome_fantasia,compartilha_davila)`) || [];
       state.emitentesDoUsuario = assoc.map(a => a.emitentes).filter(Boolean);
     }
   } catch (e) {
@@ -115,15 +118,17 @@ export async function iniciarApp() {
 }
 
 export async function showSection(sec) {
-  if (sec === 'admin' && !state.currentUser?.is_admin) {
+  if ((sec === 'admin' || sec === 'capilaridade') && !state.currentUser?.is_admin) {
     toast('Acesso restrito a administradores.', 'warn');
     return;
   }
-  ['propostas','cadastros','admin'].forEach(s => {
-    document.getElementById('section-'+s).style.display = s === sec ? 'block' : 'none';
+  ['propostas','cadastros','admin','capilaridade'].forEach(s => {
+    const el = document.getElementById('section-'+s);
+    if (el) el.style.display = s === sec ? 'block' : 'none';
     const nb = document.getElementById('nav-'+s);
     if (nb) nb.classList.toggle('active', s === sec);
   });
   if (sec === 'cadastros' && !state.todasPessoas.length) await carregarPessoas();
   if (sec === 'admin') switchAdminTab(state.currentAdminTab || 'usuarios');
+  if (sec === 'capilaridade') switchCapTab('parametros');
 }

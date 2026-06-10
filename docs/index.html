@@ -6,8 +6,8 @@
 <title>Orca — Orçamentos d'Avila</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/orca/assets/index-rUE0OdPs.js"></script>
-  <link rel="stylesheet" crossorigin href="/orca/assets/index-0H06_2mr.css">
+  <script type="module" crossorigin src="/orca/assets/index-B8wvRVX4.js"></script>
+  <link rel="stylesheet" crossorigin href="/orca/assets/index-B7zQ6Zh2.css">
 </head>
 <body>
 
@@ -22,6 +22,7 @@
     <nav class="header-nav" id="header-nav" style="display:none">
       <button class="nav-btn active" id="nav-propostas" onclick="showSection('propostas')">📋 Propostas</button>
       <button class="nav-btn" id="nav-cadastros" onclick="showSection('cadastros')">🏢 Cadastros</button>
+      <button class="nav-btn" id="nav-capilaridade" onclick="showSection('capilaridade')" style="display:none">📊 Capilaridade</button>
       <button class="nav-btn" id="nav-admin" onclick="showSection('admin')" style="display:none">⚙️ Administração</button>
     </nav>
     <div class="nav-sep" id="nav-sep" style="display:none"></div>
@@ -165,6 +166,122 @@
         <table class="data-table">
           <thead><tr><th>Grupo</th><th>Emitentes</th><th>Ano</th><th>Últ. nº fora do sistema</th><th>Próxima proposta</th><th>Propostas no Orca</th><th style="text-align:right">Ações</th></tr></thead>
           <tbody id="admin-numeracao-body"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPILARIDADE -->
+  <div id="section-capilaridade" class="app-inner" style="display:none">
+    <div class="page-header">
+      <div class="page-title">📊 <span id="cap-subtitulo">Parâmetros Financeiros</span></div>
+      <button class="btn btn-primary" id="btn-novo-cap" style="display:none">+ Novo</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchCapTab('parametros')" id="captab-parametros">💰 Parâmetros</button>
+      <button class="tab" onclick="switchCapTab('funcoes')" id="captab-funcoes">👷 Funções</button>
+      <button class="tab" onclick="switchCapTab('profissionais')" id="captab-profissionais">👤 Profissionais</button>
+      <button class="tab" onclick="switchCapTab('solucoes')" id="captab-solucoes">💡 Soluções</button>
+      <button class="tab" onclick="switchCapTab('tabela-precos')" id="captab-tabela-precos">💲 Tabela de Preços</button>
+      <button class="tab" onclick="switchCapTab('servicos-terceiros')" id="captab-servicos-terceiros">🤝 Serv. de Terceiros</button>
+    </div>
+
+    <!-- Parâmetros -->
+    <div id="capsec-parametros">
+      <div class="filter-bar">
+        <label style="font-size:13px;color:var(--text2);margin-right:4px">Emitente:</label>
+        <select class="filter-select" id="param-emitente-sel" onchange="onChangeParamEmitente()"></select>
+      </div>
+      <div id="cap-params-body"><div class="loading"><div class="spinner"></div> Carregando…</div></div>
+    </div>
+
+    <!-- Funções -->
+    <div id="capsec-funcoes" style="display:none">
+      <div class="filter-bar">
+        <select class="filter-select" id="funcoes-filtro-ativo" onchange="carregarFuncoes()">
+          <option value="true">Ativas</option>
+          <option value="false">Inativas</option>
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Nome da Função</th><th>Req. Pessoa</th><th style="text-align:right">Valor Hora Base</th><th style="text-align:right">Enc. Compl./HH</th><th>Escopo</th><th>Situação</th><th style="width:48px"></th></tr></thead>
+          <tbody id="cap-funcoes-body"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Profissionais -->
+    <div id="capsec-profissionais" style="display:none">
+      <div class="filter-bar">
+        <select class="filter-select" id="prof-filtro-ativo" onchange="carregarProfissionais()">
+          <option value="true">Ativos</option>
+          <option value="false">Inativos</option>
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Nome</th><th>Tipo</th><th>Escopo</th><th>Situação</th><th style="width:48px"></th></tr></thead>
+          <tbody id="cap-profissionais-body"><tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Soluções -->
+    <div id="capsec-solucoes" style="display:none">
+      <div class="filter-bar">
+        <select class="filter-select" id="sol-filtro-ativo" onchange="carregarSolucoes()">
+          <option value="true">Ativas</option>
+          <option value="false">Inativas</option>
+          <option value="">Todas</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Código</th><th>Nome</th><th>Descrição</th><th>Situação</th><th style="width:48px"></th></tr></thead>
+          <tbody id="cap-solucoes-body"><tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabela de Preços -->
+    <div id="capsec-tabela-precos" style="display:none">
+      <div class="filter-bar">
+        <select class="filter-select" id="tabela-filtro-cat" onchange="filtrarTabelaPrecos()">
+          <option value="">Todas as categorias</option>
+          <option value="material">Material</option>
+          <option value="ferramenta">Ferramenta</option>
+          <option value="equipamento">Equipamento</option>
+        </select>
+        <select class="filter-select" id="tabela-filtro-ativo" onchange="filtrarTabelaPrecos()">
+          <option value="true">Ativos</option>
+          <option value="false">Inativos</option>
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Descrição</th><th>Unidade</th><th>Categoria</th><th>TP</th><th style="text-align:right">Preço Atual</th><th>Situação</th><th style="width:48px"></th></tr></thead>
+          <tbody id="cap-tabela-body"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Serviços de Terceiros -->
+    <div id="capsec-servicos-terceiros" style="display:none">
+      <div class="filter-bar">
+        <select class="filter-select" id="serv-filtro-ativo" onchange="carregarServicosTerceiros()">
+          <option value="true">Ativos</option>
+          <option value="false">Inativos</option>
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>Descrição</th><th>Unidade</th><th>Escopo</th><th style="text-align:right">Preço Atual</th><th>Situação</th><th style="width:48px"></th></tr></thead>
+          <tbody id="cap-servicos-body"><tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -371,6 +488,141 @@
       <button class="btn btn-ghost" onclick="closeModal('modal-suspensao')">Cancelar</button>
       <button class="btn btn-primary" id="btn-confirmar-suspensao" onclick="confirmarAlteracaoSuspensao()">Confirmar</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Parâmetro -->
+<div class="modal-overlay" id="modal-param">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modal-param-title">Editar Parâmetro</span><button class="modal-close" onclick="closeModal('modal-param')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="param-tipo-hidden">
+      <input type="hidden" id="param-emitente-hidden">
+      <div class="form-grid form-grid-2">
+        <div class="form-group"><label>Código <span style="color:var(--red)">*</span></label><input type="text" id="param-codigo" style="text-transform:uppercase" placeholder="ex: ISS"></div>
+        <div class="form-group"><label>Percentual (%) <span style="color:var(--red)">*</span></label><input type="number" id="param-percentual" step="0.0001" min="0" max="100" placeholder="ex: 2.0000"></div>
+        <div class="form-group span2"><label>Descrição</label><input type="text" id="param-descricao" placeholder="Nome legível do parâmetro"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-param')">Cancelar</button><button class="btn btn-primary" onclick="salvarParam()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Função -->
+<div class="modal-overlay" id="modal-funcao">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modal-funcao-title">Nova Função</span><button class="modal-close" onclick="closeModal('modal-funcao')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-section-title">Dados da Função</div>
+        <div class="form-group span2"><label>Nome da Função <span style="color:var(--red)">*</span></label><input type="text" id="fn-nome" placeholder="ex: Coordenador Geral, Biólogo Sênior"></div>
+        <div class="form-group"><label>Valor Hora Padrão (R$/HH)</label><input type="number" id="fn-valor-hora" step="0.01" min="0" placeholder="ex: 85.00"></div>
+        <div class="form-group" style="display:flex;flex-direction:column;justify-content:flex-end">
+          <div class="checkbox-row"><input type="checkbox" id="fn-requer-pessoa"><label for="fn-requer-pessoa">Requer pessoa associada</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="fn-pool" checked><label for="fn-pool">Pool compartilhado (d'Avila)</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="fn-ativo" checked><label for="fn-ativo">Ativo</label></div>
+        </div>
+        <div class="form-section-title">Encargos Complementares (R$/mês por profissional — base 220h)</div>
+        <div class="form-group"><label>EPI / Uniformes</label><input type="number" id="fn-enc-EPI_UNIFORMES" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Exames Ocupacionais</label><input type="number" id="fn-enc-EXAMES_OCUPACIONAIS" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Alimentação</label><input type="number" id="fn-enc-ALIMENTACAO" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Assist. Médica e Odontológica</label><input type="number" id="fn-enc-ASSIST_MEDICA_ODONTO" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Ferramentas e Materiais</label><input type="number" id="fn-enc-FERRAMENTAS_MATERIAIS" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Auxílio Transporte</label><input type="number" id="fn-enc-AUXILIO_TRANSPORTE" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Treinamentos</label><input type="number" id="fn-enc-TREINAMENTOS" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Seguro de Vida</label><input type="number" id="fn-enc-SEGURO_VIDA" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Viagens e Hospedagens</label><input type="number" id="fn-enc-VIAGENS_HOSPEDAGENS" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Comunicação Móvel</label><input type="number" id="fn-enc-COMUNICACAO_MOVEL" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group"><label>Outros</label><input type="number" id="fn-enc-OUTROS" step="0.01" min="0" placeholder="0,00"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-funcao')">Cancelar</button><button class="btn btn-primary" onclick="salvarFuncao()">Salvar Função</button></div>
+  </div>
+</div>
+
+<!-- Modal Profissional -->
+<div class="modal-overlay" id="modal-profissional">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modal-prof-title">Novo Profissional</span><button class="modal-close" onclick="closeModal('modal-profissional')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-group span2"><label>Nome <span style="color:var(--red)">*</span></label><input type="text" id="prof-nome" placeholder="Nome completo do profissional"></div>
+        <div class="form-group"><label>Tipo</label>
+          <select id="prof-tipo">
+            <option value="colaborador">Colaborador (CLT)</option>
+            <option value="terceiro_pj">Terceiro PJ</option>
+            <option value="freelancer">Freelancer</option>
+          </select>
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;justify-content:flex-end">
+          <div class="checkbox-row"><input type="checkbox" id="prof-pool" checked><label for="prof-pool">Pool compartilhado (d'Avila)</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="prof-ativo" checked><label for="prof-ativo">Ativo</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-profissional')">Cancelar</button><button class="btn btn-primary" onclick="salvarProfissional()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Solução -->
+<div class="modal-overlay" id="modal-solucao">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modal-solucao-title">Nova Solução</span><button class="modal-close" onclick="closeModal('modal-solucao')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-group"><label>Código <span style="color:var(--red)">*</span></label><input type="text" id="sol-codigo" style="text-transform:uppercase" placeholder="ex: LIC-AMB"></div>
+        <div class="form-group"><label>Nome <span style="color:var(--red)">*</span></label><input type="text" id="sol-nome" placeholder="ex: Licenciamento Ambiental"></div>
+        <div class="form-group span2"><label>Descrição</label><textarea id="sol-descricao" rows="3" placeholder="Texto explicativo da solução…"></textarea></div>
+        <div class="form-group span2"><div class="checkbox-row"><input type="checkbox" id="sol-ativo" checked><label for="sol-ativo">Ativo</label></div></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-solucao')">Cancelar</button><button class="btn btn-primary" onclick="salvarSolucao()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Item Tabela de Preços -->
+<div class="modal-overlay" id="modal-tabela-item">
+  <div class="modal modal-lg">
+    <div class="modal-header"><span class="modal-title" id="modal-tabela-title">Novo Item</span><button class="modal-close" onclick="closeModal('modal-tabela-item')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-group span2"><label>Descrição <span style="color:var(--red)">*</span></label><input type="text" id="tab-descricao" placeholder="Descrição do item"></div>
+        <div class="form-group"><label>Unidade <span style="color:var(--red)">*</span></label><input type="text" id="tab-unidade" placeholder="ex: un, m², diária"></div>
+        <div class="form-group"><label>Categoria</label>
+          <select id="tab-categoria">
+            <option value="material">Material</option>
+            <option value="ferramenta">Ferramenta</option>
+            <option value="equipamento">Equipamento</option>
+          </select>
+        </div>
+        <div class="form-group"><label>TP</label><input type="text" id="tab-tp" maxlength="3" placeholder="PR ou AL" style="text-transform:uppercase"><span class="field-hint">PR = Próprio, AL = Alugado</span></div>
+        <div class="form-group"><label>Preço Atual (R$) <span style="color:var(--red)">*</span></label><input type="number" id="tab-preco" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group span2">
+          <div class="checkbox-row"><input type="checkbox" id="tab-pool" checked><label for="tab-pool">Pool compartilhado (d'Avila)</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="tab-ativo" checked><label for="tab-ativo">Ativo</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-tabela-item')">Cancelar</button><button class="btn btn-primary" onclick="salvarItemTabela()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Serviço de Terceiro -->
+<div class="modal-overlay" id="modal-servico">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="modal-servico-title">Novo Serviço de Terceiro</span><button class="modal-close" onclick="closeModal('modal-servico')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid form-grid-2">
+        <div class="form-group span2"><label>Descrição <span style="color:var(--red)">*</span></label><input type="text" id="sv-descricao" placeholder="Descrição do serviço"></div>
+        <div class="form-group"><label>Unidade <span style="color:var(--red)">*</span></label><input type="text" id="sv-unidade" placeholder="ex: verba, diária, km"></div>
+        <div class="form-group"><label>Preço Atual (R$) <span style="color:var(--red)">*</span></label><input type="number" id="sv-preco" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-group span2">
+          <div class="checkbox-row"><input type="checkbox" id="sv-pool" checked><label for="sv-pool">Pool compartilhado (d'Avila)</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="sv-ativo" checked><label for="sv-ativo">Ativo</label></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-servico')">Cancelar</button><button class="btn btn-primary" onclick="salvarServico()">Salvar</button></div>
   </div>
 </div>
 

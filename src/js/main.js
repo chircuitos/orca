@@ -16,6 +16,15 @@ import {
   carregarEmitentesAdmin, abrirModalNovoEmitente, abrirModalEditarEmitente,
   previewLogo, removerLogo, salvarEmitente,
 } from './admin.js';
+import {
+  switchCapTab,
+  carregarParametros, onChangeParamEmitente, abrirModalEditarParam, abrirModalAdicionarParam, salvarParam,
+  carregarFuncoes, abrirModalFuncao, abrirModalFuncaoId, salvarFuncao,
+  carregarProfissionais, abrirModalProfissional, abrirModalProfissionalId, salvarProfissional,
+  carregarSolucoes, abrirModalSolucao, abrirModalSolucaoId, salvarSolucao,
+  carregarTabelaPrecos, filtrarTabelaPrecos, abrirModalItemTabela, abrirModalItemTabelaId, salvarItemTabela,
+  carregarServicosTerceiros, abrirModalServico, abrirModalServicoId, salvarServico,
+} from './capilaridade.js';
 
 // Expose all functions called from inline onclick attributes
 Object.assign(window, {
@@ -31,6 +40,13 @@ Object.assign(window, {
   salvarUsuario, toggleAtivoUsuario,
   carregarEmitentesAdmin, abrirModalNovoEmitente, abrirModalEditarEmitente,
   previewLogo, removerLogo, salvarEmitente,
+  switchCapTab,
+  carregarParametros, onChangeParamEmitente, abrirModalEditarParam, abrirModalAdicionarParam, salvarParam,
+  carregarFuncoes, abrirModalFuncao, abrirModalFuncaoId, salvarFuncao,
+  carregarProfissionais, abrirModalProfissional, abrirModalProfissionalId, salvarProfissional,
+  carregarSolucoes, abrirModalSolucao, abrirModalSolucaoId, salvarSolucao,
+  carregarTabelaPrecos, filtrarTabelaPrecos, abrirModalItemTabela, abrirModalItemTabelaId, salvarItemTabela,
+  carregarServicosTerceiros, abrirModalServico, abrirModalServicoId, salvarServico,
 });
 
 // Close modal when clicking the overlay background
