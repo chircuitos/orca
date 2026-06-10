@@ -133,6 +133,7 @@ function _renderParametros(params, emitId) {
   let html = '';
   sections.forEach(s => {
     const list = params.filter(p => p.tipo === s.tipo);
+    const total = list.reduce((sum, p) => sum + parseFloat(p.percentual), 0);
     html += `<div class="param-section">
       <div class="param-section-header">
         <span>${s.icon} ${s.label}</span>
@@ -153,10 +154,57 @@ function _renderParametros(params, emitId) {
           <td><button class="icon-btn btn-sm" onclick="abrirModalEditarParam('${p.emitente_id}','${p.tipo}','${escHtml(p.codigo)}','${escHtml(desc)}',${p.percentual})" title="Editar">✏️</button></td>
         </tr>`;
       });
+      html += `<tr style="border-top:2px solid var(--border);background:var(--surface2)">
+        <td colspan="2" style="font-weight:700;font-size:12px;color:var(--text2)">TOTAL</td>
+        <td style="text-align:right;font-weight:800;font-family:monospace">${total.toFixed(4).replace('.',',')}%</td>
+        <td></td>
+      </tr>`;
     }
     html += `</tbody></table></div>`;
+
+    if (s.tipo === 'bdi_parcela') {
+      html += _renderBdiTcu(params);
+    }
   });
   document.getElementById('cap-params-body').innerHTML = html;
+}
+
+function _renderBdiTcu(params) {
+  const get = (tipo, codigo) => {
+    const p = params.find(x => x.tipo === tipo && x.codigo === codigo);
+    return p ? parseFloat(p.percentual) / 100 : 0;
+  };
+
+  const AC = get('bdi_parcela', 'ADM_CENTRAL');
+  const SG = get('bdi_parcela', 'SEGUROS');
+  const R  = get('bdi_parcela', 'RISCOS');
+  const DF = get('bdi_parcela', 'DESP_FINANC');
+  const L  = get('bdi_parcela', 'LUCRO');
+  const I  = params.filter(p => p.tipo === 'tributo').reduce((s, p) => s + parseFloat(p.percentual) / 100, 0);
+
+  if (I >= 1) return '';
+  const bdi = ((1 + AC + SG + R) * (1 + DF) * (1 + L)) / (1 - I) - 1;
+  const bdiPct = (bdi * 100).toFixed(4).replace('.', ',');
+
+  return `<div class="param-section" style="border:2px solid var(--azul);background:var(--azul-light)">
+    <div class="param-section-header" style="color:var(--azul)">
+      <span>📐 BDI Calculado — Fórmula TCU</span>
+    </div>
+    <table class="data-table">
+      <tbody>
+        <tr><td style="color:var(--text2);font-size:12px">AC</td><td style="color:var(--text2);font-size:12px">Administração Central</td><td style="text-align:right;font-family:monospace;font-size:12px">${(AC*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td style="color:var(--text2);font-size:12px">S+G</td><td style="color:var(--text2);font-size:12px">Seguros e Garantias</td><td style="text-align:right;font-family:monospace;font-size:12px">${(SG*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td style="color:var(--text2);font-size:12px">R</td><td style="color:var(--text2);font-size:12px">Riscos</td><td style="text-align:right;font-family:monospace;font-size:12px">${(R*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td style="color:var(--text2);font-size:12px">DF</td><td style="color:var(--text2);font-size:12px">Despesas Financeiras</td><td style="text-align:right;font-family:monospace;font-size:12px">${(DF*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td style="color:var(--text2);font-size:12px">L</td><td style="color:var(--text2);font-size:12px">Lucro</td><td style="text-align:right;font-family:monospace;font-size:12px">${(L*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr><td style="color:var(--text2);font-size:12px">I</td><td style="color:var(--text2);font-size:12px">Impostos (soma dos Tributos)</td><td style="text-align:right;font-family:monospace;font-size:12px">${(I*100).toFixed(4).replace('.',',')}%</td></tr>
+        <tr style="border-top:2px solid var(--azul)">
+          <td colspan="2" style="font-weight:800;color:var(--azul)">BDI = ((1 + AC + S + R + G) × (1 + DF) × (1 + L)) / (1 − I) − 1</td>
+          <td style="text-align:right;font-weight:800;font-family:monospace;font-size:16px;color:var(--azul)">${bdiPct}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
 }
 
 export function abrirModalEditarParam(emitente_id, tipo, codigo, descricao, percentual) {
