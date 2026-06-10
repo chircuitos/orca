@@ -1,3 +1,4 @@
 espec/
-index.html
+/index.html
 .claude/
+node_modules/
