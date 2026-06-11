@@ -618,7 +618,7 @@ export async function toggleSolucaoAtivo(id, ativo) {
 // ============================================================
 
 export async function carregarTabelaPrecos() {
-  document.getElementById('cap-tabela-body').innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  document.getElementById('cap-tabela-body').innerHTML = '<tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
     _tabelaPrecos = await api(`tabela_precos?select=*,tabela_precos_historico(preco,vigente_ate,alterado_em)&order=categoria.asc,descricao.asc${_emitenteFiltro()}`) || [];
     _tabelaPrecos.forEach(i => {
@@ -628,7 +628,7 @@ export async function carregarTabelaPrecos() {
     });
     _renderTabelaPrecos();
   } catch (e) {
-    document.getElementById('cap-tabela-body').innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+    document.getElementById('cap-tabela-body').innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
   }
 }
 
@@ -647,13 +647,14 @@ function _renderTabelaPrecos() {
       <td>${escHtml(i.unidade || '—')}</td>
       <td>${catLabel[i.categoria] || i.categoria}</td>
       <td style="font-family:monospace;font-size:11px">${i.tp || '—'}</td>
+      <td>${i.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
       <td style="text-align:right;font-weight:700;font-family:monospace">${preco}</td>
       <td><span class="${i.ativo ? 'pill-ativo' : 'pill-inativo'}">${i.ativo ? 'Ativo' : 'Inativo'}</span></td>
       <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalItemTabelaId('${i.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleItemTabelaAtivo('${i.id}',${i.ativo})" title="${i.ativo ? 'Desativar' : 'Ativar'}">${i.ativo ? '🔴' : '🟢'}</button></div></td>
     </tr>`;
   });
   document.getElementById('cap-tabela-body').innerHTML = html ||
-    '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">💲</div><div class="empty-title">Nenhum item cadastrado</div></div></td></tr>';
+    '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">💲</div><div class="empty-title">Nenhum item cadastrado</div></div></td></tr>';
 }
 
 export function filtrarTabelaPrecos() { _renderTabelaPrecos(); }
