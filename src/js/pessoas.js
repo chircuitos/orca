@@ -19,7 +19,13 @@ export async function carregarPessoas() {
   const emitId = sel?.value || '';
   document.getElementById('tabela-pessoas').innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr>';
   try {
-    let filtro = emitId ? `&emitente_id=eq.${emitId}` : '';
+    let filtro = '';
+    if (emitId) {
+      const emitObj = (state.emitentesDoUsuario || []).find(e => e.id === emitId);
+      filtro = (emitObj && emitObj.compartilha_davila)
+        ? `&or=(emitente_id.eq.${emitId},emitente_id.is.null)`
+        : `&emitente_id=eq.${emitId}`;
+    }
     if (!filtro && !state.currentUser.is_admin) {
       state.todasPessoas = [];
       renderPessoas();
