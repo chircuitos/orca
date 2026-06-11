@@ -174,8 +174,9 @@ export function abrirModalPessoa(id = null) {
     document.getElementById('pe-telefone').value = '';
     document.getElementById('pe-nome-fantasia').value = '';
     document.getElementById('pe-tipo').value = 'PJ';
-    document.getElementById('pe-cliente').checked = true;
-    document.getElementById('pe-fornecedor').checked = false;
+    const filtroTipo = document.getElementById('filtro-pessoa-tipo')?.value || '';
+    document.getElementById('pe-cliente').checked = filtroTipo !== 'fornecedor';
+    document.getElementById('pe-fornecedor').checked = filtroTipo === 'fornecedor' || filtroTipo === 'ambos';
     atualizarDocLabel();
     openModal('modal-pessoa');
     return;
