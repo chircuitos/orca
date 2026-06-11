@@ -233,7 +233,7 @@ export async function salvarUsuario() {
   const isAdm = document.getElementById('u-admin').checked;
   const isCri = document.getElementById('u-criador').checked;
   if (!nome) { toast('Informe o nome', 'error'); return; }
-  if (sigla.length !== 3) { toast('A sigla deve ter 3 caracteres', 'error'); return; }
+  if (sigla.length < 2 || sigla.length > 3) { toast('A sigla deve ter 2 ou 3 caracteres', 'error'); return; }
   if (!email) { toast('Informe o e-mail', 'error'); return; }
   const emitsSel = [...document.querySelectorAll('input[name="u-emit"]:checked')].map(i => i.value);
   blockUI('Salvando usuário…');

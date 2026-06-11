@@ -29,12 +29,12 @@ function _emitenteFiltro() {
   }
 }
 
-// Popula um <select> de emitente (só na primeira vez que options.length <= 1)
+// Popula um <select> de emitente — sempre reconstrói para refletir o usuário atual
 function _popularSeletorEmitente(selId) {
   const sel = document.getElementById(selId);
-  if (!sel || sel.options.length > 1) return;
+  if (!sel) return;
+  const currentVal = sel.value;
   if (state.currentUser?.is_admin) {
-    // Admin usa todosEmitentes — lista completa do sistema
     const emitentes = state.todosEmitentes || [];
     sel.innerHTML = '<option value="">Todos os emitentes</option>' +
       emitentes.map(e => `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`).join('');
@@ -44,6 +44,7 @@ function _popularSeletorEmitente(selId) {
       `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`
     ).join('');
   }
+  if (currentVal && [...sel.options].some(o => o.value === currentVal)) sel.value = currentVal;
 }
 
 // Constrói filtro PostgREST a partir do emitente selecionado num <select>
