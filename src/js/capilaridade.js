@@ -527,7 +527,7 @@ export async function toggleFuncaoAtivo(id, ativo) {
 export async function carregarSolucoes() {
   document.getElementById('cap-solucoes-body').innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _solucoes = await api('solucoes?select=*&order=codigo.asc') || [];
+    _solucoes = await api(`solucoes?select=*&order=codigo.asc${_emitenteFiltro()}`) || [];
     const ativoFiltro = document.getElementById('sol-filtro-ativo')?.value ?? 'true';
     const lista = ativoFiltro === '' ? _solucoes : _solucoes.filter(s => String(s.ativo) === ativoFiltro);
     let html = '';
@@ -554,6 +554,7 @@ export function abrirModalSolucao() {
   document.getElementById('sol-nome').value = '';
   document.getElementById('sol-descricao').value = '';
   document.getElementById('sol-ativo').checked = true;
+  document.getElementById('sol-pool').checked = true;
   openModal('modal-solucao');
 }
 
@@ -566,6 +567,7 @@ export function abrirModalSolucaoId(id) {
   document.getElementById('sol-nome').value = s.nome;
   document.getElementById('sol-descricao').value = s.descricao || '';
   document.getElementById('sol-ativo').checked = s.ativo;
+  document.getElementById('sol-pool').checked = !s.emitente_id;
   openModal('modal-solucao');
 }
 
@@ -574,6 +576,8 @@ export async function salvarSolucao() {
   const nome = document.getElementById('sol-nome').value.trim();
   const descricao = document.getElementById('sol-descricao').value.trim();
   const ativo = document.getElementById('sol-ativo').checked;
+  const isPool = document.getElementById('sol-pool').checked;
+  const emitente_id = isPool ? null : (state.emitentesDoUsuario[0]?.id || null);
   if (!codigo || !nome) { toast('Código e nome são obrigatórios.', 'error'); return; }
   blockUI('Salvando solução…');
   try {
@@ -585,7 +589,7 @@ export async function salvarSolucao() {
     } else {
       await api('solucoes', {
         method: 'POST',
-        body: JSON.stringify({ codigo, nome, descricao, ativo }),
+        body: JSON.stringify({ codigo, nome, descricao, ativo, emitente_id, criado_por: state.currentUser.id }),
       });
     }
     closeModal('modal-solucao');

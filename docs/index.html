@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <script type="module" crossorigin src="/orca/assets/index-VM-h_HbN.js"></script>
+  <script type="module" crossorigin src="/orca/assets/index-Cds-AJ92.js"></script>
   <link rel="stylesheet" crossorigin href="/orca/assets/index-B65GQ3kg.css">
 </head>
 <body>
@@ -577,7 +577,10 @@
         <div class="form-group"><label>Código <span style="color:var(--red)">*</span></label><input type="text" id="sol-codigo" style="text-transform:uppercase" placeholder="ex: LIC-AMB"></div>
         <div class="form-group"><label>Nome <span style="color:var(--red)">*</span></label><input type="text" id="sol-nome" placeholder="ex: Licenciamento Ambiental"></div>
         <div class="form-group span2"><label>Descrição</label><textarea id="sol-descricao" rows="3" placeholder="Texto explicativo da solução…"></textarea></div>
-        <div class="form-group span2"><div class="checkbox-row"><input type="checkbox" id="sol-ativo" checked><label for="sol-ativo">Ativo</label></div></div>
+        <div class="form-group span2">
+          <div class="checkbox-row"><input type="checkbox" id="sol-pool" checked><label for="sol-pool">Pool compartilhado (d'Avila)</label></div>
+          <div class="checkbox-row"><input type="checkbox" id="sol-ativo" checked><label for="sol-ativo">Ativo</label></div>
+        </div>
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-solucao')">Cancelar</button><button class="btn btn-primary" onclick="salvarSolucao()">Salvar</button></div>
