@@ -163,6 +163,42 @@ export function atualizarDocLabel() {
   document.getElementById('pe-doc').placeholder = tipo === 'PJ' ? '00000000000000' : '00000000000';
   document.getElementById('pe-doc').maxLength = tipo === 'PJ' ? 14 : 11;
   document.getElementById('pe-nome-label').textContent = tipo === 'PJ' ? 'Razão Social' : 'Nome Completo';
+  const btn = document.getElementById('btn-buscar-cnpj');
+  if (btn) {
+    const doc = document.getElementById('pe-doc').value.replace(/\D/g, '');
+    btn.disabled = tipo !== 'PJ' || doc.length !== 14 || !!state.editandoPessoaId;
+  }
+}
+
+export async function buscarCnpj() {
+  const cnpj = document.getElementById('pe-doc').value.replace(/\D/g, '');
+  if (cnpj.length !== 14) return;
+  const btn = document.getElementById('btn-buscar-cnpj');
+  btn.disabled = true;
+  btn.textContent = 'Buscando…';
+  try {
+    const res = await fetch(`https://publica.cnpj.ws/cnpj/${cnpj}`);
+    const data = await res.json();
+    if (!res.ok) { toast(data.detalhes || 'CNPJ não encontrado.', 'error'); return; }
+    const est = data.estabelecimento || {};
+    document.getElementById('pe-nome').value = data.razao_social || '';
+    document.getElementById('pe-nome-fantasia').value = est.nome_fantasia || '';
+    const tipoLog = est.tipo_logradouro ? est.tipo_logradouro + ' ' : '';
+    document.getElementById('pe-logradouro').value = (tipoLog + (est.logradouro || '')).trim();
+    document.getElementById('pe-numero').value = est.numero || '';
+    document.getElementById('pe-complemento').value = est.complemento ? est.complemento.replace(/\s{2,}/g, ' ').trim() : '';
+    document.getElementById('pe-bairro').value = est.bairro || '';
+    document.getElementById('pe-cidade').value = est.cidade?.nome || '';
+    document.getElementById('pe-uf').value = est.estado?.sigla || '';
+    document.getElementById('pe-cep').value = est.cep || '';
+    if (est.ddd1 && est.telefone1) document.getElementById('pe-telefone').value = `(${est.ddd1}) ${est.telefone1}`;
+    toast('Dados preenchidos ✓', 'success');
+  } catch (e) {
+    toast('Erro ao consultar CNPJ: ' + e.message, 'error');
+  } finally {
+    btn.textContent = 'Obter dados';
+    atualizarDocLabel();
+  }
 }
 
 export function abrirModalPessoa(id = null) {

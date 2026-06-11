@@ -6,7 +6,7 @@ import {
 } from './propostas.js';
 import {
   carregarPessoas, renderPessoas, selecionarPessoa, fecharPainel, editarPessoaSelecionada,
-  toggleAtivoPessoa, atualizarDocLabel, abrirModalPessoa, salvarPessoa,
+  toggleAtivoPessoa, atualizarDocLabel, buscarCnpj, abrirModalPessoa, salvarPessoa,
   abrirModalContato, editarContato, salvarContato, inativarContato,
 } from './pessoas.js';
 import {
@@ -33,7 +33,7 @@ Object.assign(window, {
   switchPropTab, abrirNovaPropostaModal, criarProposta, abrirProposta,
   abrirModalSuspensao, confirmarAlteracaoSuspensao, carregarClientesNovaProposta,
   carregarPessoas, renderPessoas, selecionarPessoa, fecharPainel, editarPessoaSelecionada,
-  toggleAtivoPessoa, atualizarDocLabel, abrirModalPessoa, salvarPessoa,
+  toggleAtivoPessoa, atualizarDocLabel, buscarCnpj, abrirModalPessoa, salvarPessoa,
   abrirModalContato, editarContato, salvarContato, inativarContato,
   switchAdminTab, abrirModalNovoAdmin, salvarNumeracao, abrirModalNumeracaoIdx,
   carregarUsuariosAdmin, abrirModalNovoUsuario, abrirModalEditarUsuario,

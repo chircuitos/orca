@@ -326,7 +326,13 @@
           <label>Tipo de Pessoa</label>
           <select id="pe-tipo" onchange="atualizarDocLabel()"><option value="PJ">Pessoa Jurídica (PJ)</option><option value="PF">Pessoa Física (PF)</option></select>
         </div>
-        <div class="form-group"><label id="pe-doc-label">CNPJ (14 dígitos)</label><input type="text" id="pe-doc" placeholder="00000000000000" maxlength="14"></div>
+        <div class="form-group">
+          <label id="pe-doc-label">CNPJ (14 dígitos)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="pe-doc" placeholder="00000000000000" maxlength="14" oninput="atualizarDocLabel()" style="flex:1">
+            <button class="btn btn-sm btn-ghost" id="btn-buscar-cnpj" onclick="buscarCnpj()" disabled title="Disponível apenas para CNPJ em novo cadastro">Obter dados</button>
+          </div>
+        </div>
         <div class="form-group span2"><label id="pe-nome-label">Razão Social</label><input type="text" id="pe-nome"></div>
         <div class="form-section-title">Classificação</div>
         <div class="form-group span2">
