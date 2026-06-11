@@ -14,6 +14,14 @@ let _solucaoEditandoId = null;
 let _profissionais = [];
 let _profEditandoId = null;
 
+// Retorna filtro PostgREST que limita registros ao pool + emitentes do usuário
+function _emitenteFiltro() {
+  const ids = (state.emitentesDoUsuario || []).map(e => e.id);
+  if (!ids.length) return '';
+  if (ids.length === 1) return `&or=(emitente_id.is.null,emitente_id.eq.${ids[0]})`;
+  return `&or=(emitente_id.is.null,emitente_id.in.(${ids.join(',')}))`;
+}
+
 const ENCARGOS_CATS = [
   { key: 'EPI_UNIFORMES',        label: 'EPI / Uniformes' },
   { key: 'EXAMES_OCUPACIONAIS',  label: 'Exames Ocupacionais' },
@@ -277,7 +285,7 @@ export async function salvarParam() {
 export async function carregarFuncoes() {
   document.getElementById('cap-funcoes-body').innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _funcoes = await api('funcoes?select=*,funcoes_encargos_complementares(categoria,valor_mensal,valor_hora,horas_mensais)&order=nome.asc') || [];
+    _funcoes = await api(`funcoes?select=*,funcoes_encargos_complementares(categoria,valor_mensal,valor_hora,horas_mensais)&order=nome.asc${_emitenteFiltro()}`) || [];
     const ativoFiltro = document.getElementById('funcoes-filtro-ativo')?.value ?? 'true';
     const lista = ativoFiltro === '' ? _funcoes : _funcoes.filter(f => String(f.ativo) === ativoFiltro);
     let html = '';
@@ -399,7 +407,7 @@ export async function salvarFuncao() {
 export async function carregarProfissionais() {
   document.getElementById('cap-profissionais-body').innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _profissionais = await api('profissionais?select=*&order=nome.asc') || [];
+    _profissionais = await api(`profissionais?select=*&order=nome.asc${_emitenteFiltro()}`) || [];
     const ativoFiltro = document.getElementById('prof-filtro-ativo')?.value ?? 'true';
     const lista = ativoFiltro === '' ? _profissionais : _profissionais.filter(p => String(p.ativo) === ativoFiltro);
     const tipoLabel = { colaborador: 'Colaborador', terceiro_pj: 'Terceiro PJ', freelancer: 'Freelancer' };
@@ -607,7 +615,7 @@ export async function toggleSolucaoAtivo(id, ativo) {
 export async function carregarTabelaPrecos() {
   document.getElementById('cap-tabela-body').innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _tabelaPrecos = await api('tabela_precos?select=*,tabela_precos_historico(preco,vigente_ate,alterado_em)&order=categoria.asc,descricao.asc') || [];
+    _tabelaPrecos = await api(`tabela_precos?select=*,tabela_precos_historico(preco,vigente_ate,alterado_em)&order=categoria.asc,descricao.asc${_emitenteFiltro()}`) || [];
     _tabelaPrecos.forEach(i => {
       const hist = (i.tabela_precos_historico || []);
       const current = hist.filter(h => !h.vigente_ate).sort((a,b) => b.alterado_em.localeCompare(a.alterado_em))[0];
@@ -625,7 +633,7 @@ function _renderTabelaPrecos() {
   let lista = _tabelaPrecos;
   if (catFiltro) lista = lista.filter(i => i.categoria === catFiltro);
   if (ativoFiltro !== '') lista = lista.filter(i => String(i.ativo) === ativoFiltro);
-  const catLabel = { material: 'Material', ferramenta: 'Ferramenta', equipamento: 'Equipamento' };
+  const catLabel = { material: 'Material', ferramenta: 'Ferramenta', equipamento: 'Equipamento', logistica: 'Logística' };
   let html = '';
   lista.forEach(i => {
     const preco = i.preco_atual !== null ? 'R$ '+parseFloat(i.preco_atual).toFixed(2).replace('.',',') : '<span style="color:var(--text3)">—</span>';
@@ -741,7 +749,7 @@ export async function toggleItemTabelaAtivo(id, ativo) {
 export async function carregarServicosTerceiros() {
   document.getElementById('cap-servicos-body').innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _servicosTerceiros = await api('servicos_terceiros?select=*,servicos_terceiros_historico(preco,vigente_ate,alterado_em)&order=descricao.asc') || [];
+    _servicosTerceiros = await api(`servicos_terceiros?select=*,servicos_terceiros_historico(preco,vigente_ate,alterado_em)&order=descricao.asc${_emitenteFiltro()}`) || [];
     _servicosTerceiros.forEach(s => {
       const hist = s.servicos_terceiros_historico || [];
       const current = hist.filter(h => !h.vigente_ate).sort((a,b) => b.alterado_em.localeCompare(a.alterado_em))[0];
