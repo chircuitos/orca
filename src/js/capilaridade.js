@@ -55,6 +55,29 @@ function _buildFiltro(selId) {
     : `&emitente_id=eq.${emitId}`;
 }
 
+// Renderiza a célula de Escopo: "Pool" para null, prefixo do emitente para exclusivos
+function _escopoHtml(emitente_id) {
+  if (!emitente_id) return '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul);font-size:10px">Pool</span>';
+  const allEmit = state.todosEmitentes || state.emitentesDoUsuario || [];
+  const prefixo = allEmit.find(e => e.id === emitente_id)?.prefixo || '—';
+  return `<span style="color:var(--text3);font-size:11px;font-weight:700">${escHtml(prefixo)}</span>`;
+}
+
+// Controla visibilidade do checkbox pool no modal (só admin vê)
+function _togglePoolVisivel(checkboxId) {
+  const el = document.getElementById(checkboxId);
+  if (el) el.closest('.checkbox-row').style.display = state.currentUser?.is_admin ? '' : 'none';
+}
+
+// Determina o emitente_id para salvar um novo item
+function _emitenteIdParaSalvar(poolCheckboxId, selectorId) {
+  const isAdmin = state.currentUser?.is_admin;
+  const isPool = isAdmin && document.getElementById(poolCheckboxId)?.checked;
+  if (isPool) return null;
+  const selVal = document.getElementById(selectorId)?.value || null;
+  return selVal || state.emitentesDoUsuario[0]?.id || null;
+}
+
 const ENCARGOS_CATS = [
   { key: 'EPI_UNIFORMES',        label: 'EPI / Uniformes' },
   { key: 'EXAMES_OCUPACIONAIS',  label: 'Exames Ocupacionais' },
@@ -335,7 +358,7 @@ export async function carregarFuncoes() {
         <td style="text-align:right;font-family:monospace">${valorBase.toFixed(2).replace('.',',')}</td>
         <td style="text-align:right;font-family:monospace;font-size:12px;color:var(--text2)">${totalCompl > 0 ? totalCompl.toFixed(2).replace('.',',') : '—'}</td>
         <td style="text-align:right;font-family:monospace;font-weight:700">${valorHora > 0 ? valorHora.toFixed(2).replace('.',',') : '—'}</td>
-        <td>${isPool ? '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>' : '<span style="color:var(--text3);font-size:12px">Exclusivo</span>'}</td>
+        <td>${_escopoHtml(f.emitente_id)}</td>
         <td><span class="${f.ativo ? 'pill-ativo' : 'pill-inativo'}">${f.ativo ? 'Ativo' : 'Inativo'}</span></td>
         <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalFuncaoId('${f.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleFuncaoAtivo('${f.id}',${f.ativo})" title="${f.ativo ? 'Desativar' : 'Ativar'}">${f.ativo ? '🔴' : '🟢'}</button></div></td>
       </tr>`;
@@ -349,6 +372,7 @@ export async function carregarFuncoes() {
 
 export function abrirModalFuncao() {
   _funcaoEditandoId = null;
+  _togglePoolVisivel('fn-pool');
   document.getElementById('modal-funcao-title').textContent = 'Nova Função';
   document.getElementById('fn-nome').value = '';
   document.getElementById('fn-requer-pessoa').checked = false;
@@ -367,6 +391,7 @@ export function abrirModalFuncaoId(id) {
   const f = _funcoes.find(x => x.id === id);
   if (!f) return;
   _funcaoEditandoId = id;
+  _togglePoolVisivel('fn-pool');
   document.getElementById('modal-funcao-title').textContent = 'Editar Função';
   document.getElementById('fn-nome').value = f.nome;
   document.getElementById('fn-requer-pessoa').checked = f.requer_pessoa;
@@ -389,8 +414,7 @@ export async function salvarFuncao() {
   const vhRaw = document.getElementById('fn-valor-hora').value.replace(',','.');
   const valor_hora_padrao = vhRaw ? parseFloat(vhRaw) : null;
   const ativo = document.getElementById('fn-ativo').checked;
-  const isPool = document.getElementById('fn-pool').checked;
-  const emitente_id = isPool ? null : (state.emitentesDoUsuario[0]?.id || null);
+  const emitente_id = _emitenteIdParaSalvar('fn-pool', 'funcoes-emitente-sel');
   if (!nome) { toast('Informe o nome da função.', 'error'); return; }
   blockUI('Salvando função…');
   try {
@@ -453,7 +477,7 @@ export async function carregarProfissionais() {
         <td>${escHtml(p.nome)}</td>
         <td style="font-family:monospace;font-size:12px">${escHtml(doc)}</td>
         <td>${tipoLabel[p.tipo] || p.tipo}</td>
-        <td>${p.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
+        <td>${_escopoHtml(p.emitente_id)}</td>
         <td><span class="${p.ativo ? 'pill-ativo' : 'pill-inativo'}">${p.ativo ? 'Ativo' : 'Inativo'}</span></td>
         <td><div class="row-actions">
           <button class="icon-btn btn-sm" onclick="abrirModalProfissionalId('${p.id}')" title="Editar">✏️</button>
@@ -470,6 +494,7 @@ export async function carregarProfissionais() {
 
 export function abrirModalProfissional() {
   _profEditandoId = null;
+  _togglePoolVisivel('prof-pool');
   document.getElementById('modal-prof-title').textContent = 'Novo Profissional';
   document.getElementById('prof-nome').value = '';
   document.getElementById('prof-cpf-cnpj').value = '';
@@ -483,6 +508,7 @@ export function abrirModalProfissionalId(id) {
   const p = _profissionais.find(x => x.id === id);
   if (!p) return;
   _profEditandoId = id;
+  _togglePoolVisivel('prof-pool');
   document.getElementById('modal-prof-title').textContent = 'Editar Profissional';
   document.getElementById('prof-nome').value = p.nome;
   document.getElementById('prof-cpf-cnpj').value = p.cpf_cnpj || '';
@@ -497,8 +523,7 @@ export async function salvarProfissional() {
   const cpf_cnpj = document.getElementById('prof-cpf-cnpj').value.replace(/\D/g, '') || null;
   const tipo = document.getElementById('prof-tipo').value;
   const ativo = document.getElementById('prof-ativo').checked;
-  const isPool = document.getElementById('prof-pool').checked;
-  const emitente_id = isPool ? null : (state.emitentesDoUsuario[0]?.id || null);
+  const emitente_id = _emitenteIdParaSalvar('prof-pool', 'prof-emitente-sel');
   if (!nome) { toast('Informe o nome do profissional.', 'error'); return; }
   if (cpf_cnpj && cpf_cnpj.length !== 11 && cpf_cnpj.length !== 14) {
     toast('CPF deve ter 11 dígitos e CNPJ 14 dígitos.', 'error'); return;
@@ -572,7 +597,7 @@ export async function carregarSolucoes() {
         <td style="font-family:monospace;font-weight:700;font-size:12px">${escHtml(s.codigo)}</td>
         <td>${escHtml(s.nome)}</td>
         <td style="color:var(--text2);font-size:12px">${escHtml(s.descricao || '—')}</td>
-        <td>${s.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
+        <td>${_escopoHtml(s.emitente_id)}</td>
         <td><span class="${s.ativo ? 'pill-ativo' : 'pill-inativo'}">${s.ativo ? 'Ativo' : 'Inativo'}</span></td>
         <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalSolucaoId('${s.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleSolucaoAtivo('${s.id}',${s.ativo})" title="${s.ativo ? 'Desativar' : 'Ativar'}">${s.ativo ? '🔴' : '🟢'}</button></div></td>
       </tr>`;
@@ -586,6 +611,7 @@ export async function carregarSolucoes() {
 
 export function abrirModalSolucao() {
   _solucaoEditandoId = null;
+  _togglePoolVisivel('sol-pool');
   document.getElementById('modal-solucao-title').textContent = 'Nova Solução';
   document.getElementById('sol-codigo').value = '';
   document.getElementById('sol-nome').value = '';
@@ -599,6 +625,7 @@ export function abrirModalSolucaoId(id) {
   const s = _solucoes.find(x => x.id === id);
   if (!s) return;
   _solucaoEditandoId = id;
+  _togglePoolVisivel('sol-pool');
   document.getElementById('modal-solucao-title').textContent = 'Editar Solução';
   document.getElementById('sol-codigo').value = s.codigo;
   document.getElementById('sol-nome').value = s.nome;
@@ -613,8 +640,7 @@ export async function salvarSolucao() {
   const nome = document.getElementById('sol-nome').value.trim();
   const descricao = document.getElementById('sol-descricao').value.trim();
   const ativo = document.getElementById('sol-ativo').checked;
-  const isPool = document.getElementById('sol-pool').checked;
-  const emitente_id = isPool ? null : (state.emitentesDoUsuario[0]?.id || null);
+  const emitente_id = _emitenteIdParaSalvar('sol-pool', 'sol-emitente-sel');
   if (!codigo || !nome) { toast('Código e nome são obrigatórios.', 'error'); return; }
   blockUI('Salvando solução…');
   try {
@@ -684,7 +710,7 @@ function _renderTabelaPrecos() {
       <td>${escHtml(i.unidade || '—')}</td>
       <td>${catLabel[i.categoria] || i.categoria}</td>
       <td style="font-family:monospace;font-size:11px">${i.tp || '—'}</td>
-      <td>${i.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
+      <td>${_escopoHtml(i.emitente_id)}</td>
       <td style="text-align:right;font-weight:700;font-family:monospace">${preco}</td>
       <td><span class="${i.ativo ? 'pill-ativo' : 'pill-inativo'}">${i.ativo ? 'Ativo' : 'Inativo'}</span></td>
       <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalItemTabelaId('${i.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleItemTabelaAtivo('${i.id}',${i.ativo})" title="${i.ativo ? 'Desativar' : 'Ativar'}">${i.ativo ? '🔴' : '🟢'}</button></div></td>
@@ -698,6 +724,7 @@ export function filtrarTabelaPrecos() { _renderTabelaPrecos(); }
 
 export function abrirModalItemTabela() {
   _tabelaItemEditandoId = null;
+  _togglePoolVisivel('tab-pool');
   document.getElementById('modal-tabela-title').textContent = 'Novo Item';
   document.getElementById('tab-descricao').value = '';
   document.getElementById('tab-unidade').value = '';
@@ -713,6 +740,7 @@ export function abrirModalItemTabelaId(id) {
   const item = _tabelaPrecos.find(x => x.id === id);
   if (!item) return;
   _tabelaItemEditandoId = id;
+  _togglePoolVisivel('tab-pool');
   document.getElementById('modal-tabela-title').textContent = 'Editar Item';
   document.getElementById('tab-descricao').value = item.descricao;
   document.getElementById('tab-unidade').value = item.unidade || '';
@@ -732,8 +760,7 @@ export async function salvarItemTabela() {
   const precoRaw = document.getElementById('tab-preco').value.replace(',','.');
   const preco = parseFloat(precoRaw);
   const ativo = document.getElementById('tab-ativo').checked;
-  const isPool = document.getElementById('tab-pool').checked;
-  const emitente_id = isPool ? null : (state.emitentesDoUsuario[0]?.id || null);
+  const emitente_id = _emitenteIdParaSalvar('tab-pool', 'tabela-emitente-sel');
   if (!descricao || !unidade || isNaN(preco)) { toast('Descrição, unidade e preço são obrigatórios.', 'error'); return; }
   blockUI('Salvando item…');
   try {
@@ -807,7 +834,7 @@ export async function carregarServicosTerceiros() {
       html += `<tr>
         <td>${escHtml(s.descricao)}</td>
         <td>${escHtml(s.unidade || '—')}</td>
-        <td>${s.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
+        <td>${_escopoHtml(s.emitente_id)}</td>
         <td style="text-align:right;font-weight:700;font-family:monospace">${preco}</td>
         <td><span class="${s.ativo ? 'pill-ativo' : 'pill-inativo'}">${s.ativo ? 'Ativo' : 'Inativo'}</span></td>
         <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalServicoId('${s.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleServicoAtivo('${s.id}',${s.ativo})" title="${s.ativo ? 'Desativar' : 'Ativar'}">${s.ativo ? '🔴' : '🟢'}</button></div></td>
@@ -822,6 +849,7 @@ export async function carregarServicosTerceiros() {
 
 export function abrirModalServico() {
   _servicoEditandoId = null;
+  _togglePoolVisivel('sv-pool');
   document.getElementById('modal-servico-title').textContent = 'Novo Serviço de Terceiro';
   document.getElementById('sv-descricao').value = '';
   document.getElementById('sv-unidade').value = '';
@@ -835,6 +863,7 @@ export function abrirModalServicoId(id) {
   const s = _servicosTerceiros.find(x => x.id === id);
   if (!s) return;
   _servicoEditandoId = id;
+  _togglePoolVisivel('sv-pool');
   document.getElementById('modal-servico-title').textContent = 'Editar Serviço de Terceiro';
   document.getElementById('sv-descricao').value = s.descricao;
   document.getElementById('sv-unidade').value = s.unidade || '';
@@ -850,8 +879,7 @@ export async function salvarServico() {
   const precoRaw = document.getElementById('sv-preco').value.replace(',','.');
   const preco = parseFloat(precoRaw);
   const ativo = document.getElementById('sv-ativo').checked;
-  const isPool = document.getElementById('sv-pool').checked;
-  const emitente_id = isPool ? null : (state.emitentesDoUsuario[0]?.id || null);
+  const emitente_id = _emitenteIdParaSalvar('sv-pool', 'serv-emitente-sel');
   if (!descricao || !unidade || isNaN(preco)) { toast('Descrição, unidade e preço são obrigatórios.', 'error'); return; }
   blockUI('Salvando serviço…');
   try {
