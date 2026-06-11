@@ -29,6 +29,32 @@ function _emitenteFiltro() {
   }
 }
 
+// Popula um <select> de emitente (só na primeira vez que options.length <= 1)
+function _popularSeletorEmitente(selId) {
+  const sel = document.getElementById(selId);
+  if (!sel || sel.options.length > 1) return;
+  const emitentes = state.emitentesDoUsuario || [];
+  if (state.currentUser?.is_admin) {
+    sel.innerHTML = '<option value="">Todos os emitentes</option>' +
+      emitentes.map(e => `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`).join('');
+  } else {
+    sel.innerHTML = emitentes.map(e =>
+      `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`
+    ).join('');
+  }
+}
+
+// Constrói filtro PostgREST a partir do emitente selecionado num <select>
+function _buildFiltro(selId) {
+  const sel = document.getElementById(selId);
+  const emitId = sel?.value || '';
+  if (!emitId) return _emitenteFiltro();
+  const emitObj = (state.emitentesDoUsuario || []).find(e => e.id === emitId);
+  return (emitObj && emitObj.compartilha_davila)
+    ? `&or=(emitente_id.eq.${emitId},emitente_id.is.null)`
+    : `&emitente_id=eq.${emitId}`;
+}
+
 const ENCARGOS_CATS = [
   { key: 'EPI_UNIFORMES',        label: 'EPI / Uniformes' },
   { key: 'EXAMES_OCUPACIONAIS',  label: 'Exames Ocupacionais' },
@@ -290,9 +316,10 @@ export async function salvarParam() {
 // ============================================================
 
 export async function carregarFuncoes() {
+  _popularSeletorEmitente('funcoes-emitente-sel');
   document.getElementById('cap-funcoes-body').innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _funcoes = await api(`funcoes?select=*,funcoes_encargos_complementares(categoria,valor_mensal,valor_hora,horas_mensais)&order=nome.asc${_emitenteFiltro()}`) || [];
+    _funcoes = await api(`funcoes?select=*,funcoes_encargos_complementares(categoria,valor_mensal,valor_hora,horas_mensais)&order=nome.asc${_buildFiltro('funcoes-emitente-sel')}`) || [];
     const ativoFiltro = document.getElementById('funcoes-filtro-ativo')?.value ?? 'true';
     const lista = ativoFiltro === '' ? _funcoes : _funcoes.filter(f => String(f.ativo) === ativoFiltro);
     let html = '';
@@ -412,9 +439,10 @@ export async function salvarFuncao() {
 // ============================================================
 
 export async function carregarProfissionais() {
+  _popularSeletorEmitente('prof-emitente-sel');
   document.getElementById('cap-profissionais-body').innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _profissionais = await api(`profissionais?select=*&order=nome.asc${_emitenteFiltro()}`) || [];
+    _profissionais = await api(`profissionais?select=*&order=nome.asc${_buildFiltro('prof-emitente-sel')}`) || [];
     const ativoFiltro = document.getElementById('prof-filtro-ativo')?.value ?? 'true';
     const lista = ativoFiltro === '' ? _profissionais : _profissionais.filter(p => String(p.ativo) === ativoFiltro);
     const tipoLabel = { colaborador: 'Colaborador', terceiro_pj: 'Terceiro PJ', freelancer: 'Freelancer' };
@@ -532,9 +560,10 @@ export async function toggleFuncaoAtivo(id, ativo) {
 // ============================================================
 
 export async function carregarSolucoes() {
+  _popularSeletorEmitente('sol-emitente-sel');
   document.getElementById('cap-solucoes-body').innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _solucoes = await api(`solucoes?select=*&order=codigo.asc${_emitenteFiltro()}`) || [];
+    _solucoes = await api(`solucoes?select=*&order=codigo.asc${_buildFiltro('sol-emitente-sel')}`) || [];
     const ativoFiltro = document.getElementById('sol-filtro-ativo')?.value ?? 'true';
     const lista = ativoFiltro === '' ? _solucoes : _solucoes.filter(s => String(s.ativo) === ativoFiltro);
     let html = '';
@@ -625,9 +654,10 @@ export async function toggleSolucaoAtivo(id, ativo) {
 // ============================================================
 
 export async function carregarTabelaPrecos() {
+  _popularSeletorEmitente('tabela-emitente-sel');
   document.getElementById('cap-tabela-body').innerHTML = '<tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _tabelaPrecos = await api(`tabela_precos?select=*,tabela_precos_historico(preco,vigente_ate,alterado_em)&order=categoria.asc,descricao.asc${_emitenteFiltro()}`) || [];
+    _tabelaPrecos = await api(`tabela_precos?select=*,tabela_precos_historico(preco,vigente_ate,alterado_em)&order=categoria.asc,descricao.asc${_buildFiltro('tabela-emitente-sel')}`) || [];
     _tabelaPrecos.forEach(i => {
       const hist = (i.tabela_precos_historico || []);
       const current = hist.filter(h => !h.vigente_ate).sort((a,b) => b.alterado_em.localeCompare(a.alterado_em))[0];
@@ -760,9 +790,10 @@ export async function toggleItemTabelaAtivo(id, ativo) {
 // ============================================================
 
 export async function carregarServicosTerceiros() {
+  _popularSeletorEmitente('serv-emitente-sel');
   document.getElementById('cap-servicos-body').innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
-    _servicosTerceiros = await api(`servicos_terceiros?select=*,servicos_terceiros_historico(preco,vigente_ate,alterado_em)&order=descricao.asc${_emitenteFiltro()}`) || [];
+    _servicosTerceiros = await api(`servicos_terceiros?select=*,servicos_terceiros_historico(preco,vigente_ate,alterado_em)&order=descricao.asc${_buildFiltro('serv-emitente-sel')}`) || [];
     _servicosTerceiros.forEach(s => {
       const hist = s.servicos_terceiros_historico || [];
       const current = hist.filter(h => !h.vigente_ate).sort((a,b) => b.alterado_em.localeCompare(a.alterado_em))[0];

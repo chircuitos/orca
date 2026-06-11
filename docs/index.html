@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <script type="module" crossorigin src="/orca/assets/index-xSxpaqz3.js"></script>
+  <script type="module" crossorigin src="/orca/assets/index-C5I8-P0C.js"></script>
   <link rel="stylesheet" crossorigin href="/orca/assets/index-B65GQ3kg.css">
 </head>
 <body>
@@ -41,7 +41,7 @@
   <div class="login-card">
     <div class="login-header">
       <div class="login-title">Sistema de Orçamentos</div>
-      <div class="login-sub">Versão compartilhada 1.32 — 11/jun/2026</div>
+      <div class="login-sub">Versão compartilhada 1.33 — 11/jun/2026</div>
     </div>
     <div class="login-body">
       <div class="login-error" id="login-error"></div>
@@ -200,6 +200,7 @@
     <!-- Funções -->
     <div id="capsec-funcoes" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="funcoes-emitente-sel" onchange="carregarFuncoes()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="funcoes-filtro-ativo" onchange="carregarFuncoes()">
           <option value="true">Ativas</option>
           <option value="false">Inativas</option>
@@ -217,6 +218,7 @@
     <!-- Profissionais -->
     <div id="capsec-profissionais" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="prof-emitente-sel" onchange="carregarProfissionais()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="prof-filtro-ativo" onchange="carregarProfissionais()">
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>
@@ -234,6 +236,7 @@
     <!-- Soluções -->
     <div id="capsec-solucoes" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="sol-emitente-sel" onchange="carregarSolucoes()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="sol-filtro-ativo" onchange="carregarSolucoes()">
           <option value="true">Ativas</option>
           <option value="false">Inativas</option>
@@ -251,6 +254,7 @@
     <!-- Tabela de Preços -->
     <div id="capsec-tabela-precos" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="tabela-emitente-sel" onchange="carregarTabelaPrecos()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="tabela-filtro-cat" onchange="filtrarTabelaPrecos()">
           <option value="">Todas as categorias</option>
           <option value="material">Material</option>
@@ -275,6 +279,7 @@
     <!-- Serviços de Terceiros -->
     <div id="capsec-servicos-terceiros" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="serv-emitente-sel" onchange="carregarServicosTerceiros()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="serv-filtro-ativo" onchange="carregarServicosTerceiros()">
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>

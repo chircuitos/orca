@@ -199,6 +199,7 @@
     <!-- Funções -->
     <div id="capsec-funcoes" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="funcoes-emitente-sel" onchange="carregarFuncoes()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="funcoes-filtro-ativo" onchange="carregarFuncoes()">
           <option value="true">Ativas</option>
           <option value="false">Inativas</option>
@@ -216,6 +217,7 @@
     <!-- Profissionais -->
     <div id="capsec-profissionais" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="prof-emitente-sel" onchange="carregarProfissionais()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="prof-filtro-ativo" onchange="carregarProfissionais()">
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>
@@ -233,6 +235,7 @@
     <!-- Soluções -->
     <div id="capsec-solucoes" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="sol-emitente-sel" onchange="carregarSolucoes()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="sol-filtro-ativo" onchange="carregarSolucoes()">
           <option value="true">Ativas</option>
           <option value="false">Inativas</option>
@@ -250,6 +253,7 @@
     <!-- Tabela de Preços -->
     <div id="capsec-tabela-precos" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="tabela-emitente-sel" onchange="carregarTabelaPrecos()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="tabela-filtro-cat" onchange="filtrarTabelaPrecos()">
           <option value="">Todas as categorias</option>
           <option value="material">Material</option>
@@ -274,6 +278,7 @@
     <!-- Serviços de Terceiros -->
     <div id="capsec-servicos-terceiros" style="display:none">
       <div class="filter-bar">
+        <select class="filter-select" id="serv-emitente-sel" onchange="carregarServicosTerceiros()"><option value="">— emitente —</option></select>
         <select class="filter-select" id="serv-filtro-ativo" onchange="carregarServicosTerceiros()">
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>
