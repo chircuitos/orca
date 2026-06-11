@@ -78,6 +78,7 @@ export function logout() {
     const nb = document.getElementById('nav-'+s);
     if (nb) nb.classList.toggle('active', s === 'propostas');
   });
+  document.getElementById('nav-cadastros').style.display = 'none';
   document.getElementById('nav-capilaridade').style.display = 'none';
   state.currentAdminTab = 'usuarios';
 }
@@ -100,8 +101,12 @@ export async function iniciarApp() {
   });
   if (state.currentUser.is_admin) {
     document.getElementById('nav-admin').style.display = 'flex';
+    document.getElementById('nav-cadastros').style.display = 'flex';
     document.getElementById('nav-capilaridade').style.display = 'flex';
     document.getElementById('user-role-badge').style.display = 'inline';
+  } else if (state.currentUser.pode_criar_proposta) {
+    document.getElementById('nav-cadastros').style.display = 'flex';
+    document.getElementById('nav-capilaridade').style.display = 'flex';
   }
   document.getElementById('btn-nova-proposta').style.display = state.currentUser.pode_criar_proposta ? '' : 'none';
   try {
@@ -118,8 +123,16 @@ export async function iniciarApp() {
 }
 
 export async function showSection(sec) {
-  if ((sec === 'admin' || sec === 'capilaridade') && !state.currentUser?.is_admin) {
+  if (sec === 'admin' && !state.currentUser?.is_admin) {
     toast('Acesso restrito a administradores.', 'warn');
+    return;
+  }
+  if (sec === 'cadastros' && !state.currentUser?.is_admin && !state.currentUser?.pode_criar_proposta) {
+    toast('Acesso restrito.', 'warn');
+    return;
+  }
+  if (sec === 'capilaridade' && !state.currentUser?.is_admin && !state.currentUser?.pode_criar_proposta) {
+    toast('Acesso restrito.', 'warn');
     return;
   }
   ['propostas','cadastros','admin','capilaridade'].forEach(s => {
