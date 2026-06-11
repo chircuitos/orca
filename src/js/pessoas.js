@@ -183,8 +183,7 @@ export async function buscarCnpj() {
     const est = data.estabelecimento || {};
     document.getElementById('pe-nome').value = data.razao_social || '';
     document.getElementById('pe-nome-fantasia').value = est.nome_fantasia || '';
-    const tipoLog = est.tipo_logradouro ? est.tipo_logradouro + ' ' : '';
-    document.getElementById('pe-logradouro').value = (tipoLog + (est.logradouro || '')).trim();
+    document.getElementById('pe-logradouro').value = [est.tipo_logradouro, est.logradouro].filter(v => v && v.trim()).join(' ');
     document.getElementById('pe-numero').value = est.numero || '';
     document.getElementById('pe-complemento').value = est.complemento ? est.complemento.replace(/\s{2,}/g, ' ').trim() : '';
     document.getElementById('pe-bairro').value = est.bairro || '';
