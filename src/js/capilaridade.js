@@ -14,12 +14,19 @@ let _solucaoEditandoId = null;
 let _profissionais = [];
 let _profEditandoId = null;
 
-// Retorna filtro PostgREST que limita registros ao pool + emitentes do usuário
+// Retorna filtro PostgREST respeitando pool (compartilha_davila) + emitentes do usuário
 function _emitenteFiltro() {
-  const ids = (state.emitentesDoUsuario || []).map(e => e.id);
-  if (!ids.length) return '';
-  if (ids.length === 1) return `&or=(emitente_id.is.null,emitente_id.eq.${ids[0]})`;
-  return `&or=(emitente_id.is.null,emitente_id.in.(${ids.join(',')}))`;
+  const emitentes = state.emitentesDoUsuario || [];
+  if (!emitentes.length) return '';
+  const ids = emitentes.map(e => e.id);
+  const incluiPool = emitentes.some(e => e.compartilha_davila);
+  if (incluiPool) {
+    if (ids.length === 1) return `&or=(emitente_id.is.null,emitente_id.eq.${ids[0]})`;
+    return `&or=(emitente_id.is.null,emitente_id.in.(${ids.join(',')}))`;
+  } else {
+    if (ids.length === 1) return `&emitente_id=eq.${ids[0]}`;
+    return `&emitente_id=in.(${ids.join(',')})`;
+  }
 }
 
 const ENCARGOS_CATS = [
