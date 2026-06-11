@@ -525,7 +525,7 @@ export async function toggleFuncaoAtivo(id, ativo) {
 // ============================================================
 
 export async function carregarSolucoes() {
-  document.getElementById('cap-solucoes-body').innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  document.getElementById('cap-solucoes-body').innerHTML = '<tr><td colspan="6"><div class="loading"><div class="spinner"></div></div></td></tr>';
   try {
     _solucoes = await api(`solucoes?select=*&order=codigo.asc${_emitenteFiltro()}`) || [];
     const ativoFiltro = document.getElementById('sol-filtro-ativo')?.value ?? 'true';
@@ -536,14 +536,15 @@ export async function carregarSolucoes() {
         <td style="font-family:monospace;font-weight:700;font-size:12px">${escHtml(s.codigo)}</td>
         <td>${escHtml(s.nome)}</td>
         <td style="color:var(--text2);font-size:12px">${escHtml(s.descricao || '—')}</td>
+        <td>${s.emitente_id ? '<span style="color:var(--text3);font-size:12px">Exclusivo</span>' : '<span class="pill-ativo" style="background:var(--azul-light);color:var(--azul)">Pool</span>'}</td>
         <td><span class="${s.ativo ? 'pill-ativo' : 'pill-inativo'}">${s.ativo ? 'Ativo' : 'Inativo'}</span></td>
         <td><div class="row-actions"><button class="icon-btn btn-sm" onclick="abrirModalSolucaoId('${s.id}')" title="Editar">✏️</button><button class="icon-btn btn-sm" onclick="toggleSolucaoAtivo('${s.id}',${s.ativo})" title="${s.ativo ? 'Desativar' : 'Ativar'}">${s.ativo ? '🔴' : '🟢'}</button></div></td>
       </tr>`;
     });
     document.getElementById('cap-solucoes-body').innerHTML = html ||
-      '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">💡</div><div class="empty-title">Nenhuma solução cadastrada</div></div></td></tr>';
+      '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">💡</div><div class="empty-title">Nenhuma solução cadastrada</div></div></td></tr>';
   } catch (e) {
-    document.getElementById('cap-solucoes-body').innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
+    document.getElementById('cap-solucoes-body').innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;
   }
 }
 
