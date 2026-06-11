@@ -33,11 +33,13 @@ function _emitenteFiltro() {
 function _popularSeletorEmitente(selId) {
   const sel = document.getElementById(selId);
   if (!sel || sel.options.length > 1) return;
-  const emitentes = state.emitentesDoUsuario || [];
   if (state.currentUser?.is_admin) {
+    // Admin usa todosEmitentes — lista completa do sistema
+    const emitentes = state.todosEmitentes || [];
     sel.innerHTML = '<option value="">Todos os emitentes</option>' +
       emitentes.map(e => `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`).join('');
   } else {
+    const emitentes = state.emitentesDoUsuario || [];
     sel.innerHTML = emitentes.map(e =>
       `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`
     ).join('');
@@ -49,6 +51,8 @@ function _buildFiltro(selId) {
   const sel = document.getElementById(selId);
   const emitId = sel?.value || '';
   if (!emitId) return _emitenteFiltro();
+  // Admin: filtro direto por emitente (pool aparece em "Todos os emitentes")
+  if (state.currentUser?.is_admin) return `&emitente_id=eq.${emitId}`;
   const emitObj = (state.emitentesDoUsuario || []).find(e => e.id === emitId);
   return (emitObj && emitObj.compartilha_davila)
     ? `&or=(emitente_id.eq.${emitId},emitente_id.is.null)`
