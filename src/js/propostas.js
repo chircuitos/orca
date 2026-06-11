@@ -97,25 +97,23 @@ export async function carregarSelectsNovaProposta() {
       o.textContent = e.nome_fantasia || e.prefixo;
       sel.appendChild(o);
     });
-    let filtroC = '';
-    if (!state.currentUser.is_admin) {
-      const ids = state.emitentesDoUsuario.map(e => e.id);
-      const pool = state.emitentesDoUsuario.some(e => e.compartilha_davila);
-      if (ids.length > 0 && pool) {
-        filtroC = '&or=(emitente_id.in.(' + ids.join(',') + '),emitente_id.is.null)';
-      } else if (ids.length > 0) {
-        filtroC = ids.length === 1 ? '&emitente_id=eq.' + ids[0] : '&emitente_id=in.(' + ids.join(',') + ')';
-      } else if (pool) {
-        filtroC = '&emitente_id=is.null';
-      } else {
-        const selC = document.getElementById('np-cliente');
-        selC.innerHTML = '<option value="">— sem clientes disponíveis —</option>';
-        return;
-      }
+    document.getElementById('np-cliente').innerHTML = '<option value="">— selecione o emitente primeiro —</option>';
+  } catch (e) {
+    console.error('carregarSelectsNovaProposta:', e);
+  }
+}
+
+export async function carregarClientesNovaProposta() {
+  const eid = document.getElementById('np-emitente').value;
+  const selC = document.getElementById('np-cliente');
+  selC.innerHTML = '<option value="">— selecione —</option>';
+  if (!eid) return;
+  try {
+    const cli = await api(`pessoas?is_cliente=eq.true&ativo=eq.true&emitente_id=eq.${eid}&select=id,razao_social,nome_fantasia&order=razao_social`) || [];
+    if (!cli.length) {
+      selC.innerHTML = '<option value="">— nenhum cliente cadastrado —</option>';
+      return;
     }
-    const cli = await api('pessoas?is_cliente=eq.true&ativo=eq.true&select=id,razao_social,nome_fantasia&order=razao_social' + filtroC) || [];
-    const selC = document.getElementById('np-cliente');
-    selC.innerHTML = '<option value="">— selecione —</option>';
     cli.forEach(c => {
       const o = document.createElement('option');
       o.value = c.id;
@@ -123,7 +121,7 @@ export async function carregarSelectsNovaProposta() {
       selC.appendChild(o);
     });
   } catch (e) {
-    console.error('carregarSelectsNovaProposta:', e);
+    console.error('carregarClientesNovaProposta:', e);
   }
 }
 

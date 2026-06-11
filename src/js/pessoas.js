@@ -4,25 +4,28 @@ import { escHtml, formatCNPJ, formatCPF, formatCEP, panelField } from './utils.j
 import { openModal, closeModal, blockUI, unblockUI, toast } from './ui.js';
 
 export async function carregarPessoas() {
+  const sel = document.getElementById('pessoas-emitente-sel');
+  if (sel && sel.options.length <= 1) {
+    const emitentes = state.emitentesDoUsuario || [];
+    if (state.currentUser.is_admin) {
+      sel.innerHTML = '<option value="">Todos os emitentes</option>' +
+        emitentes.map(e => `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`).join('');
+    } else {
+      sel.innerHTML = emitentes.map(e =>
+        `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`
+      ).join('');
+    }
+  }
+  const emitId = sel?.value || '';
   document.getElementById('tabela-pessoas').innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr>';
   try {
-    let filtro = '';
-    if (!state.currentUser.is_admin) {
-      const ids = state.emitentesDoUsuario.map(e => e.id);
-      const pool = state.emitentesDoUsuario.some(e => e.compartilha_davila);
-      if (ids.length > 0 && pool) {
-        filtro = '&or=(emitente_id.in.(' + ids.join(',') + '),emitente_id.is.null)';
-      } else if (ids.length > 0) {
-        filtro = ids.length === 1 ? '&emitente_id=eq.' + ids[0] : '&emitente_id=in.(' + ids.join(',') + ')';
-      } else if (pool) {
-        filtro = '&emitente_id=is.null';
-      } else {
-        state.todasPessoas = [];
-        renderPessoas();
-        return;
-      }
+    let filtro = emitId ? `&emitente_id=eq.${emitId}` : '';
+    if (!filtro && !state.currentUser.is_admin) {
+      state.todasPessoas = [];
+      renderPessoas();
+      return;
     }
-    state.todasPessoas = await api('pessoas?select=id,tipo_pessoa,documento,razao_social,bairro,cidade,uf,logradouro,numero,complemento,cep,is_cliente,is_fornecedor,ativo,emitente_id&order=razao_social' + filtro) || [];
+    state.todasPessoas = await api('pessoas?select=id,tipo_pessoa,documento,razao_social,nome_fantasia,bairro,cidade,uf,logradouro,numero,complemento,cep,is_cliente,is_fornecedor,ativo,emitente_id&order=razao_social' + filtro) || [];
     renderPessoas();
   } catch (e) {
     document.getElementById('tabela-pessoas').innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erro</div><div class="empty-sub">${escHtml(e.message)}</div></div></td></tr>`;

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  <script type="module" crossorigin src="/orca/assets/index-CPK8G6dw.js"></script>
+  <script type="module" crossorigin src="/orca/assets/index-COIQnVlK.js"></script>
   <link rel="stylesheet" crossorigin href="/orca/assets/index-B65GQ3kg.css">
 </head>
 <body>
@@ -41,7 +41,7 @@
   <div class="login-card">
     <div class="login-header">
       <div class="login-title">Sistema de Orçamentos</div>
-      <div class="login-sub">Versão compartilhada 1.29 — 11/jun/2026</div>
+      <div class="login-sub">Versão compartilhada 1.30 — 11/jun/2026</div>
     </div>
     <div class="login-body">
       <div class="login-error" id="login-error"></div>
@@ -90,6 +90,7 @@
       <button class="btn btn-primary" onclick="abrirModalPessoa()">+ Nova Pessoa</button>
     </div>
     <div class="filter-bar">
+      <select class="filter-select" id="pessoas-emitente-sel" onchange="carregarPessoas()"><option value="">— emitente —</option></select>
       <input class="filter-input" type="text" id="filtro-pessoa-texto" placeholder="🔍  Buscar por nome ou documento…" oninput="renderPessoas()">
       <select class="filter-select" id="filtro-pessoa-tipo" onchange="renderPessoas()">
         <option value="">Todos</option>
@@ -298,7 +299,7 @@
     <div class="modal-header"><span class="modal-title">Nova Proposta</span><button class="modal-close" onclick="closeModal('modal-nova-proposta')">✕</button></div>
     <div class="modal-body">
       <div class="form-grid form-grid-2">
-        <div class="form-group"><label>Emitente</label><select id="np-emitente"></select></div>
+        <div class="form-group"><label>Emitente</label><select id="np-emitente" onchange="carregarClientesNovaProposta()"></select></div>
         <div class="form-group"><label>Tipo de Cliente</label><select id="np-tipo-cliente"><option value="PR">Privado</option><option value="PU">Público</option></select></div>
         <div class="form-group span2"><label>Cliente</label><select id="np-cliente"><option value="">— selecione —</option></select></div>
         <div class="form-group span2"><label>Objetivo</label><textarea id="np-objetivo" rows="2" placeholder="Descrição resumida do objeto contratado…"></textarea></div>

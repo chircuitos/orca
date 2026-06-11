@@ -2,7 +2,7 @@ import { login, logout, showSection } from './auth.js';
 import { openModal, closeModal } from './ui.js';
 import {
   switchPropTab, abrirNovaPropostaModal, criarProposta, abrirProposta,
-  abrirModalSuspensao, confirmarAlteracaoSuspensao,
+  abrirModalSuspensao, confirmarAlteracaoSuspensao, carregarClientesNovaProposta,
 } from './propostas.js';
 import {
   renderPessoas, selecionarPessoa, fecharPainel, editarPessoaSelecionada,
@@ -31,7 +31,7 @@ Object.assign(window, {
   login, logout, showSection,
   openModal, closeModal,
   switchPropTab, abrirNovaPropostaModal, criarProposta, abrirProposta,
-  abrirModalSuspensao, confirmarAlteracaoSuspensao,
+  abrirModalSuspensao, confirmarAlteracaoSuspensao, carregarClientesNovaProposta,
   renderPessoas, selecionarPessoa, fecharPainel, editarPessoaSelecionada,
   toggleAtivoPessoa, atualizarDocLabel, abrirModalPessoa, salvarPessoa,
   abrirModalContato, editarContato, salvarContato, inativarContato,
