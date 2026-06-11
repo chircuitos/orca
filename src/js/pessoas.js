@@ -5,7 +5,8 @@ import { openModal, closeModal, blockUI, unblockUI, toast } from './ui.js';
 
 export async function carregarPessoas() {
   const sel = document.getElementById('pessoas-emitente-sel');
-  if (sel && sel.options.length <= 1) {
+  if (sel) {
+    const currentVal = sel.value;
     const emitentes = state.emitentesDoUsuario || [];
     if (state.currentUser.is_admin) {
       sel.innerHTML = '<option value="">Todos os emitentes</option>' +
@@ -15,6 +16,7 @@ export async function carregarPessoas() {
         `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`
       ).join('');
     }
+    if (currentVal && [...sel.options].some(o => o.value === currentVal)) sel.value = currentVal;
   }
   const emitId = sel?.value || '';
   document.getElementById('tabela-pessoas').innerHTML = '<tr><td colspan="7"><div class="loading"><div class="spinner"></div> Carregando…</div></td></tr>';
@@ -207,10 +209,17 @@ export async function salvarPessoa() {
   if (!doc) { toast('Informe o documento', 'error'); return; }
   if (!nome) { toast('Informe o nome / razão social', 'error'); return; }
   if (!isCliente && !isFornecedor) { toast('Marque ao menos Cliente ou Fornecedor', 'error'); return; }
-  let emitenteIdPessoa = null;
-  if (!state.currentUser.is_admin && state.emitentesDoUsuario.length > 0) {
-    const naoCompartilha = state.emitentesDoUsuario.find(e => !e.compartilha_davila);
-    if (naoCompartilha) emitenteIdPessoa = naoCompartilha.id;
+  const selEmit = document.getElementById('pessoas-emitente-sel');
+  const selVal = selEmit?.value || '';
+  let emitenteIdPessoa;
+  if (selVal) {
+    emitenteIdPessoa = selVal;
+  } else if (state.currentUser.is_admin) {
+    toast('Selecione um emitente específico antes de cadastrar.', 'warn');
+    unblockUI();
+    return;
+  } else {
+    emitenteIdPessoa = state.emitentesDoUsuario[0]?.id || null;
   }
   const payload = {
     tipo_pessoa: tipo,
