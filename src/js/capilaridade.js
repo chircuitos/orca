@@ -164,13 +164,8 @@ const PARAM_LABELS = {
 let _paramEditando = {};
 
 export async function carregarParametros() {
-  const emitentes = state.emitentesDoUsuario || [];
+  _popularSeletorEmitente('param-emitente-sel');
   const sel = document.getElementById('param-emitente-sel');
-  if (sel.options.length <= 1 && emitentes.length) {
-    sel.innerHTML = emitentes.map(e =>
-      `<option value="${e.id}">${escHtml(e.nome_fantasia || e.prefixo)}</option>`
-    ).join('');
-  }
   const emitId = sel.value;
   if (!emitId) {
     document.getElementById('cap-params-body').innerHTML = '<div class="empty-state"><div class="empty-icon">🏛️</div><div class="empty-title">Nenhum emitente disponível</div></div>';
