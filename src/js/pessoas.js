@@ -102,6 +102,7 @@ export async function selecionarPessoa(id) {
     html += panelField('Tipo', p.tipo_pessoa === 'PJ' ? 'Pessoa Jurídica' : 'Pessoa Física');
     html += panelField('Classificação', (p.is_cliente && p.is_fornecedor) ? 'Cliente e Fornecedor' : p.is_cliente ? 'Cliente' : 'Fornecedor');
     if (p.telefone) html += panelField('Telefone', p.telefone);
+    if (p.email) html += panelField('E-mail', p.email);
     if (p.nome_fantasia && p.nome_fantasia !== p.razao_social) html += panelField('Nome Fantasia', p.nome_fantasia);
     const end = [p.logradouro, p.numero ? 'nº ' + p.numero : '', p.complemento, p.bairro, p.cidade && p.uf ? p.cidade + ' — ' + p.uf : p.cidade || p.uf || ''].filter(Boolean).join(', ');
     if (end) html += panelField('Endereço', end);
@@ -207,6 +208,7 @@ export function abrirModalPessoa(id = null) {
   if (!id) {
     campos.forEach(f => document.getElementById(f).value = '');
     document.getElementById('pe-telefone').value = '';
+    document.getElementById('pe-email').value = '';
     document.getElementById('pe-nome-fantasia').value = '';
     document.getElementById('pe-tipo').value = 'PJ';
     const filtroTipo = document.getElementById('filtro-pessoa-tipo')?.value || '';
@@ -224,6 +226,7 @@ export function abrirModalPessoa(id = null) {
   document.getElementById('pe-cliente').checked = p.is_cliente;
   document.getElementById('pe-fornecedor').checked = p.is_fornecedor;
   document.getElementById('pe-telefone').value = p.telefone || '';
+  document.getElementById('pe-email').value = p.email || '';
   document.getElementById('pe-nome-fantasia').value = p.nome_fantasia || '';
   document.getElementById('pe-logradouro').value = p.logradouro || '';
   document.getElementById('pe-numero').value = p.numero || '';
@@ -272,6 +275,7 @@ export async function salvarPessoa() {
     uf: document.getElementById('pe-uf').value.trim().toUpperCase() || null,
     cep: document.getElementById('pe-cep').value.trim().replace(/\D/g, '') || null,
     telefone: document.getElementById('pe-telefone').value.trim() || null,
+    email: document.getElementById('pe-email').value.trim() || null,
     nome_fantasia: document.getElementById('pe-nome-fantasia').value.trim() || null,
   };
   blockUI('Salvando…');
